@@ -2,6 +2,7 @@ from pathlib import Path
 
 from mlops_rakuten.pipelines.data_ingestion import DataIngestionPipeline
 from mlops_rakuten.pipelines.data_preprocessing import DataPreprocessingPipeline
+from mlops_rakuten.pipelines.data_transformation import DataTransformationPipeline
 
 
 # ---------------------------
@@ -22,6 +23,14 @@ class DummyDataPreprocessingStep:
 
     def run(self) -> Path:
         return Path("/fake/path/preprocessed_dataset.csv")
+
+
+class DummyDataTransformationStep:
+    def __init__(self, config):
+        self.config = config
+
+    def run(self) -> Path:
+        return Path("/fake/path/processed")
 
 
 # ---------------------------
@@ -60,3 +69,19 @@ def test_data_preprocessing_pipeline_calls_step(monkeypatch):
     output = pipeline.run()
 
     assert output == Path("/fake/path/preprocessed_dataset.csv")
+
+
+def test_data_transformation_pipeline_calls_step(monkeypatch):
+    """
+    Vérifie que DataTransformationPipeline utilise bien la classe DataTransformation
+    et retourne le dossier d'artefacts attendu.
+    """
+    monkeypatch.setattr(
+        "mlops_rakuten.pipelines.data_transformation.DataTransformation",
+        DummyDataTransformationStep,
+    )
+
+    pipeline = DataTransformationPipeline()
+    output = pipeline.run()
+
+    assert output == Path("/fake/path/processed")

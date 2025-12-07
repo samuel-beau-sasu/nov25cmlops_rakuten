@@ -3,6 +3,7 @@ import typer
 
 from mlops_rakuten.pipelines.data_ingestion import DataIngestionPipeline
 from mlops_rakuten.pipelines.data_preprocessing import DataPreprocessingPipeline
+from mlops_rakuten.pipelines.data_transformation import DataTransformationPipeline
 
 app = typer.Typer()
 
@@ -26,6 +27,11 @@ def main():
     preprocessing_pipeline = DataPreprocessingPipeline()
     preprocessing_output_path = preprocessing_pipeline.run()
     logger.success(f"Dataset prétraité disponible à : {preprocessing_output_path}")
+
+    # 3. Transformation
+    transformation_pipeline = DataTransformationPipeline()
+    transformation_output_path = transformation_pipeline.run()
+    logger.success(f"Dataset transformé disponible à : {transformation_output_path}")
 
 
 if __name__ == "__main__":

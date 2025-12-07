@@ -26,7 +26,10 @@ data_preprocessing:
 data_transformation:
   # Fichiers d'entrée / sortie
   input_dataset_filename: "preprocessed_dataset.csv"
-#  output_dir: "processed"
+
+  # colonnes
+  text_column: "designation"
+  target_column: "prdtypecode"
 
   # Split train / validation
   test_size: 0.2
@@ -38,7 +41,7 @@ data_transformation:
   ngram_min: 1
   ngram_max: 2
   lowercase: true
-  stop_words: null  # null = pas de stopwords ; "english" possible
+  stop_words: "english"  # null possible
 
   # Label encoding
   label_encoder_filename: "label_encoder.pkl"
