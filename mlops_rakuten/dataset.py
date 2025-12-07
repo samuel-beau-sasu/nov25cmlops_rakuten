@@ -4,6 +4,7 @@ import typer
 from mlops_rakuten.pipelines.data_ingestion import DataIngestionPipeline
 from mlops_rakuten.pipelines.data_preprocessing import DataPreprocessingPipeline
 from mlops_rakuten.pipelines.data_transformation import DataTransformationPipeline
+from mlops_rakuten.pipelines.model_trainer import ModelTrainerPipeline
 
 app = typer.Typer()
 
@@ -32,6 +33,11 @@ def main():
     transformation_pipeline = DataTransformationPipeline()
     transformation_output_path = transformation_pipeline.run()
     logger.success(f"Dataset transformé disponible à : {transformation_output_path}")
+
+    # 4. Entraînement du modèle
+    model_trainer_pipeline = ModelTrainerPipeline()
+    model_path = model_trainer_pipeline.run()
+    logger.success(f"Modèle entraîné disponible à : {model_path}")
 
 
 if __name__ == "__main__":

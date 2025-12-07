@@ -7,6 +7,7 @@ import yaml
 from mlops_rakuten.config import (
     CONFIG_FILE_PATH,
     INTERIM_DATA_DIR,
+    MODELS_DIR,
     PROCESSED_DATA_DIR,
     RAW_DATA_DIR,
 )
@@ -14,6 +15,7 @@ from mlops_rakuten.entities import (
     DataIngestionConfig,
     DataPreprocessingConfig,
     DataTransformationConfig,
+    ModelTrainerConfig,
 )
 
 
@@ -116,4 +118,37 @@ class ConfigurationManager:
             y_val_path=output_dir / c["y_val_filename"],
             text_column=c["text_column"],
             target_column=c["target_column"],
+        )
+
+    def get_model_trainer_config(self) -> ModelTrainerConfig:
+        """
+        Construit un ModelTrainerConfig à partir de la section
+        'model_trainer' du YAML, en combinant avec PROCESSED_DATA_DIR / MODELS_DIR.
+
+        Cette configuration permet de :
+        - charger X_train / y_train transformés
+        - instancier le modèle sklearn (LinearSVC, etc.)
+        - sauvegarder le modèle entraîné et ses hyperparamètres.
+        """
+        c = self._config["model_trainer"]
+
+        model_dir = MODELS_DIR
+        model_path = model_dir / c["model_filename"]
+
+        X_train_path = PROCESSED_DATA_DIR / c["X_train_filename"]
+        y_train_path = PROCESSED_DATA_DIR / c["y_train_filename"]
+
+        logger.debug(f"model_path resolved to: {model_path}")
+        logger.debug(f"X_train_path resolved to: {X_train_path}")
+        logger.debug(f"y_train_path resolved to: {y_train_path}")
+
+        return ModelTrainerConfig(
+            model_path=model_path,
+            model_dir=model_dir,
+            X_train_path=X_train_path,
+            y_train_path=y_train_path,
+            model_type=c["model_type"],
+            C=c["C"],
+            max_iter=c["max_iter"],
+            use_class_weight=c["use_class_weight"],
         )

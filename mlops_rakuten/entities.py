@@ -54,3 +54,17 @@ class DataTransformationConfig:
 
     text_column: str
     target_column: str
+
+
+@dataclass
+class ModelTrainerConfig:
+    model_path: Path
+    model_dir: Path
+    X_train_path: Path
+    y_train_path: Path
+
+    model_type: str
+
+    C: float
+    max_iter: int
+    use_class_weight: bool

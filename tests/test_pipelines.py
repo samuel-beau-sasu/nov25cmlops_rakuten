@@ -3,11 +3,12 @@ from pathlib import Path
 from mlops_rakuten.pipelines.data_ingestion import DataIngestionPipeline
 from mlops_rakuten.pipelines.data_preprocessing import DataPreprocessingPipeline
 from mlops_rakuten.pipelines.data_transformation import DataTransformationPipeline
-
+from mlops_rakuten.pipelines.model_trainer import ModelTrainerPipeline
 
 # ---------------------------
 # Dummy Steps
 # ---------------------------
+
 
 class DummyDataIngestionStep:
     def __init__(self, config):
@@ -30,7 +31,15 @@ class DummyDataTransformationStep:
         self.config = config
 
     def run(self) -> Path:
-        return Path("/fake/path/processed")
+        return Path("/fake/path/tfidf_vectorizer.pkl")
+
+
+class DummyModelTrainerStep:
+    def __init__(self, config):
+        self.config = config
+
+    def run(self) -> Path:
+        return Path("/fake/path/text_classifier.pkl")
 
 
 # ---------------------------
@@ -84,4 +93,20 @@ def test_data_transformation_pipeline_calls_step(monkeypatch):
     pipeline = DataTransformationPipeline()
     output = pipeline.run()
 
-    assert output == Path("/fake/path/processed")
+    assert output == Path("/fake/path/tfidf_vectorizer.pkl")
+
+
+def test_model_trainer_pipeline_calls_step(monkeypatch):
+    """
+    Vérifie que ModelTrainerPipeline utilise bien la classe ModelTrainer
+    et retourne le chemin du modèle attendu.
+    """
+    monkeypatch.setattr(
+        "mlops_rakuten.pipelines.model_trainer.ModelTrainer",
+        DummyModelTrainerStep,
+    )
+
+    pipeline = ModelTrainerPipeline()
+    output = pipeline.run()
+
+    assert output == Path("/fake/path/text_classifier.pkl")
