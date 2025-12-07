@@ -1,0 +1,37 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "mlops_rakuten"
+version = "0.0.1"
+description = "Product type classification for Rakuten France"
+authors = [
+  { name = "C. Fabre J. Therier S. Beau" },
+]
+
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    
+]
+requires-python = "~=3.12.0"
+dependencies = [
+    "dotenv>=0.9.9",
+    "python-box>=7.3.2",
+    "pyyaml>=6.0.3",
+]
+
+
+[tool.ruff]
+line-length = 99
+src = ["mlops_rakuten"]
+include = ["pyproject.toml", "mlops_rakuten/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]  # Add import sorting
+
+[tool.ruff.lint.isort]
+known-first-party = ["mlops_rakuten"]
+force-sort-within-sections = true
+

@@ -1,0 +1,19 @@
+dotenv
+ipython
+jupyterlab
+loguru
+matplotlib
+mkdocs
+notebook
+numpy
+pandas
+pip
+pytest
+python-box
+python-dotenv
+pyyaml
+ruff
+scikit-learn
+tqdm
+typer
+-e .

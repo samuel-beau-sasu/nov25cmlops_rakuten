@@ -1,0 +1,4 @@
+data_ingestion:
+  x_train_filename: "X_train_update.csv"
+  y_train_filename: "Y_train_CVw08PX.csv"
+  output_dataset_filename: "dataset.csv"
