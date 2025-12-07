@@ -1,4 +1,52 @@
 data_ingestion:
+  # Fichiers d'entrée / sortie
   x_train_filename: "X_train_update.csv"
   y_train_filename: "Y_train_CVw08PX.csv"
-  output_dataset_filename: "dataset.csv"
+  output_dataset_filename: "ingested_dataset.csv"
+
+data_preprocessing:
+  # Fichiers d'entrée / sortie
+  input_dataset_filename: "ingested_dataset.csv"
+  output_dataset_filename: "preprocessed_dataset.csv"
+
+  # colonnes
+  text_column: "designation"
+  target_column: "prdtypecode"
+
+  # nettoyage basique
+  drop_na_text: true
+  drop_na_target: true
+  drop_duplicates: true
+
+  # règles sur les outliers de texte
+  min_char_length: 10  # trop court → on supprime
+  max_char_length: 1000  # trop long → on supprime ou tronque
+  min_alpha_ratio: 0.2  # au moins 20% de lettres dans le texte
+
+data_transformation:
+  # Fichiers d'entrée / sortie
+  input_dataset_filename: "preprocessed_dataset.csv"
+#  output_dir: "processed"
+
+  # Split train / validation
+  test_size: 0.2
+  random_state: 42
+  stratify: true
+
+  # TF-IDF vectorizer
+  max_features: 20000
+  ngram_min: 1
+  ngram_max: 2
+  lowercase: true
+  stop_words: null  # null = pas de stopwords ; "english" possible
+
+  # Label encoding
+  label_encoder_filename: "label_encoder.pkl"
+  class_mapping_filename: "class_mapping.json"
+
+  # Artefacts vectorisation
+  vectorizer_filename: "tfidf_vectorizer.pkl"
+  X_train_filename: "X_train_tfidf.npz"
+  X_val_filename: "X_val_tfidf.npz"
+  y_train_filename: "y_train.npy"
+  y_val_filename: "y_val.npy"

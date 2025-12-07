@@ -1,20 +1,38 @@
 from pathlib import Path
-from mlops_rakuten.pipelines.data_ingestion import DataIngestionPipeline
 
+from mlops_rakuten.pipelines.data_ingestion import DataIngestionPipeline
+from mlops_rakuten.pipelines.data_preprocessing import DataPreprocessingPipeline
+
+
+# ---------------------------
+# Dummy Steps
+# ---------------------------
 
 class DummyDataIngestionStep:
     def __init__(self, config):
         self.config = config
 
     def run(self) -> Path:
-        return Path("/fake/path/dataset.csv")
+        return Path("/fake/path/ingested_dataset.csv")
 
+
+class DummyDataPreprocessingStep:
+    def __init__(self, config):
+        self.config = config
+
+    def run(self) -> Path:
+        return Path("/fake/path/preprocessed_dataset.csv")
+
+
+# ---------------------------
+# Tests
+# ---------------------------
 
 def test_data_ingestion_pipeline_calls_step(monkeypatch):
-    from mlops_rakuten import pipelines
-    from mlops_rakuten import config_manager
-
-    # Monkeypatch DataIngestion pour le remplacer par DummyStep
+    """
+    Vérifie que DataIngestionPipeline utilise bien la classe DataIngestion
+    et retourne le chemin prévu.
+    """
     monkeypatch.setattr(
         "mlops_rakuten.pipelines.data_ingestion.DataIngestion",
         DummyDataIngestionStep,
@@ -23,4 +41,22 @@ def test_data_ingestion_pipeline_calls_step(monkeypatch):
     pipeline = DataIngestionPipeline()
     output = pipeline.run()
 
-    assert output == Path("/fake/path/dataset.csv")
+    assert output == Path("/fake/path/ingested_dataset.csv")
+
+
+def test_data_preprocessing_pipeline_calls_step(monkeypatch):
+    """
+    Vérifie que DataPreprocessingPipeline utilise bien la classe DataPreprocessing
+    et retourne le chemin prévu.
+    """
+
+    # Monkeypatch de la classe DataPreprocessing
+    monkeypatch.setattr(
+        "mlops_rakuten.pipelines.data_preprocessing.DataPreprocessing",
+        DummyDataPreprocessingStep,
+    )
+
+    pipeline = DataPreprocessingPipeline()
+    output = pipeline.run()
+
+    assert output == Path("/fake/path/preprocessed_dataset.csv")

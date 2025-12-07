@@ -15,7 +15,7 @@ class DataIngestion:
     - Charge Y_train_CVw08PX.csv (labels)
     - Vérifie l'alignement des index
     - Fusionne X et y
-    - Sauvegarde un dataset fusionné dans data/processed/
+    - Sauvegarde un dataset fusionné dans data/interim/
     """
 
     def __init__(self, config: DataIngestionConfig) -> None:
@@ -28,14 +28,16 @@ class DataIngestion:
         """
         logger.info("Démarrage de l'étape DataIngestion")
 
+        cfg = self.config
+
         # 1. Charger X
-        logger.info(f"Lecture de X_train depuis : {self.config.x_train_path}")
-        X = pd.read_csv(self.config.x_train_path, index_col=0)
+        logger.info(f"Lecture de X_train depuis : {cfg.x_train_path}")
+        X = pd.read_csv(cfg.x_train_path, index_col=0)
         logger.debug(f"X shape: {X.shape}")
 
         # 2. Charger y
-        logger.info(f"Lecture de Y_train depuis : {self.config.y_train_path}")
-        y = pd.read_csv(self.config.y_train_path, index_col=0)
+        logger.info(f"Lecture de Y_train depuis : {cfg.y_train_path}")
+        y = pd.read_csv(cfg.y_train_path, index_col=0)
         logger.debug(f"y shape: {y.shape}")
 
         # 3. Vérifier l'alignement des index

@@ -80,6 +80,25 @@ Product type classification for Rakuten France
 Step 1: Classes de Configuration
 - mlops_rakuten/config.py définit les variables globales contenant les chemins vers les répertoires et fichiers.
 - mlops_rakuten/config.yml définit tous les chemins vers les fichiers qui seront utilisés ou créés à chaque étape du pipeline.
+- mlops_rakuten/entities.py définit toutes les classes qui seront utilisés comme configuration.
+
+Step 2: Configuration Manager
+- mlops_rakuten/config_manager.py crée les objets de configuration en s’appuyant sur les classes définies préalablement.
+  + DataIngestionConfig
+  + DataPreprocessingConfig
+
+Step 3: les modules de Data et Model
+- mlops_rakuten/modeling/ définit les modules utilisés dans les pipelines Data et Model:
+  + mlops_rakuten/modeling/data_ingestion.py définit le module de DataIngestion (fusion des datasets features et target)
+  + mlops_rakuten/modeling/data_preprocessing.py définit le module de DataPreprocessing (n/a, outliers, duplicates, etc.)
+
+Step 4: Étapes du Pipeline
+- mlops_rakuten/pipelines/ définit les pipelines qui seront instanciés et exécutés:
+  + mlops_rakuten/pipelines/data_ingestion.py
+  + mlops_rakuten/pipelines/data_preprocessing.py
+
+Step 5: Exécution de la Pipeline complète
+- mlops_rakuten/dataset.py permet d'exécuter l'ensemble de la Pipeline.
 
 ---
 
