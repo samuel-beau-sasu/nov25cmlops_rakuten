@@ -82,3 +82,12 @@ model_evaluation:
   metrics_filename: "metrics_val.json"
   classification_report_filename: "classification_report_val.txt"
   confusion_matrix_filename: "confusion_matrix_val.npy"
+
+prediction:
+  # Artefacts nécessaires
+  vectorizer_filename: "tfidf_vectorizer.pkl"
+  label_encoder_filename: "label_encoder.pkl"
+  model_filename: "text_classifier.pkl"
+
+  # Colonnes / champs
+  text_column: "designation"

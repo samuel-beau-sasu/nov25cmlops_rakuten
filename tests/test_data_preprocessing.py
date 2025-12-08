@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 
 from mlops_rakuten.entities import DataPreprocessingConfig
-from mlops_rakuten.modeling.data_preprocessing import DataPreprocessing
+from mlops_rakuten.modules.data_preprocessing import DataPreprocessing
 
 
 def test_data_preprocessing_cleans_dataset(tmp_path):

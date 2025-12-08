@@ -7,7 +7,7 @@ import numpy as np
 from scipy import sparse
 
 from mlops_rakuten.entities import ModelTrainerConfig
-from mlops_rakuten.modeling.model_trainer import ModelTrainer
+from mlops_rakuten.modules.model_trainer import ModelTrainer
 
 
 def test_model_trainer_trains_and_saves_artifacts(tmp_path):

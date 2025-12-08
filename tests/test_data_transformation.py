@@ -7,7 +7,7 @@ import pandas as pd
 from scipy import sparse
 
 from mlops_rakuten.entities import DataTransformationConfig
-from mlops_rakuten.modeling.data_transformation import DataTransformation
+from mlops_rakuten.modules.data_transformation import DataTransformation
 
 
 def test_data_transformation_creates_artifacts(tmp_path):

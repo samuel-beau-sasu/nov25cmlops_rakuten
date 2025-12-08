@@ -18,6 +18,7 @@ from mlops_rakuten.entities import (
     DataTransformationConfig,
     ModelEvaluationConfig,
     ModelTrainerConfig,
+    PredictionConfig,
 )
 
 
@@ -193,4 +194,31 @@ class ConfigurationManager:
             metrics_dir=metrics_dir,
             classification_report_path=classification_report_path,
             confusion_matrix_path=confusion_matrix_path,
+        )
+
+    def get_prediction_config(self) -> PredictionConfig:
+        """
+        Construit un PredictionConfig à partir de la section
+        'prediction' du YAML, en combinant avec PROCESSED_DATA_DIR / MODELS_DIR.
+
+        Cette configuration permet de :
+        - recharger le vectorizer TF-IDF
+        - recharger le LabelEncoder
+        - recharger le modèle entraîné
+        """
+        c = self._config["prediction"]
+
+        vectorizer_path = PROCESSED_DATA_DIR / c["vectorizer_filename"]
+        label_encoder_path = PROCESSED_DATA_DIR / c["label_encoder_filename"]
+        model_path = MODELS_DIR / c["model_filename"]
+
+        logger.debug(f"vectorizer_path resolved to: {vectorizer_path}")
+        logger.debug(f"label_encoder_path resolved to: {label_encoder_path}")
+        logger.debug(f"model_path resolved to: {model_path}")
+
+        return PredictionConfig(
+            vectorizer_path=vectorizer_path,
+            label_encoder_path=label_encoder_path,
+            model_path=model_path,
+            text_column=c["text_column"],
         )

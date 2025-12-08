@@ -80,3 +80,12 @@ class ModelEvaluationConfig:
     metrics_dir: Path
     classification_report_path: Path
     confusion_matrix_path: Path
+
+
+@dataclass
+class PredictionConfig:
+    vectorizer_path: Path
+    label_encoder_path: Path
+    model_path: Path
+
+    text_column: str

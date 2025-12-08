@@ -4,7 +4,7 @@ from pathlib import Path
 from loguru import logger
 
 from mlops_rakuten.config_manager import ConfigurationManager
-from mlops_rakuten.modeling.data_transformation import DataTransformation
+from mlops_rakuten.modules.data_transformation import DataTransformation
 
 
 class DataTransformationPipeline:

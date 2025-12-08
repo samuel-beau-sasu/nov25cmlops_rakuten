@@ -6,12 +6,13 @@ from mlops_rakuten.pipelines.data_preprocessing import DataPreprocessingPipeline
 from mlops_rakuten.pipelines.data_transformation import DataTransformationPipeline
 from mlops_rakuten.pipelines.model_evaluation import ModelEvaluationPipeline
 from mlops_rakuten.pipelines.model_trainer import ModelTrainerPipeline
+from mlops_rakuten.pipelines.prediction import PredictionPipeline
 
 app = typer.Typer()
 
 
 @app.command()
-def main():
+def train():
     """
     Point d'entrée CLI pour construire le dataset prêt pour la modélisation.
     Enchaîne :
@@ -44,6 +45,23 @@ def main():
     model_evaluation_pipeline = ModelEvaluationPipeline()
     metrics_path = model_evaluation_pipeline.run()
     logger.success(f"Métriques de validation disponibles dans : {metrics_path}")
+
+
+@app.command()
+def predict(text: str):
+    """
+    Effectue une prédiction à partir d'un texte.
+
+    Exemple:
+    python -m mlops_rakuten.dataset predict "Super aspirateur sans fil"
+    """
+    logger.info("Démarrage de l'inférence via CLI")
+
+    pipeline = PredictionPipeline()
+    pred = pipeline.run([text])
+
+    logger.success(f"Texte : {text}")
+    logger.success(f"prdtypecode prédit : {pred[0]}")
 
 
 if __name__ == "__main__":

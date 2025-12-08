@@ -21,7 +21,7 @@ class ModelTrainer:
     - Entraîne le modèle
     - Calcule quelques métriques sur le jeu d'entraînement
     - Sauvegarde :
-        - le modèle entraîné (model.pkl)
+        - le modèle entraîné (text_classifier.pkl)
         - un fichier JSON décrivant la configuration d'entraînement
         - un fichier JSON contenant les métriques d'entraînement
         - un rapport texte de classification sur le train
