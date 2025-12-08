@@ -23,6 +23,5 @@ class ModelTrainerPipeline:
         step = ModelTrainer(config=model_trainer_config)
         model_path = step.run()
 
-        logger.success(
-            f"Pipeline ModelTrainer terminé. Modèle créé : {model_path}")
+        logger.success(f"Pipeline ModelTrainer terminé. Modèle créé : {model_path}")
         return model_path

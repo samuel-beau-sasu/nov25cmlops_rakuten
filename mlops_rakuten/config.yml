@@ -69,3 +69,16 @@ model_trainer:
   C: 1.0
   max_iter: 2000
   use_class_weight: true     # "balanced" si true, ré-équilibrage des classes
+
+model_evaluation:
+  # Chemin vers le modèle entraîné
+  model_filename: "text_classifier.pkl"
+
+  # Chemins vers les données de validation transformées
+  X_val_filename: "X_val_tfidf.npz"
+  y_val_filename: "y_val.npy"
+
+  # Fichiers de sortie pour les résultats de validation
+  metrics_filename: "metrics_val.json"
+  classification_report_filename: "classification_report_val.txt"
+  confusion_matrix_filename: "confusion_matrix_val.npy"

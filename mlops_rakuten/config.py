@@ -19,7 +19,6 @@ EXTERNAL_DATA_DIR = DATA_DIR / "external"
 MODELS_DIR = PROJ_ROOT / "models"
 
 REPORTS_DIR = PROJ_ROOT / "reports"
-FIGURES_DIR = REPORTS_DIR / "figures"
 
 MODULE_DIR = PROJ_ROOT / "mlops_rakuten"
 CONFIG_FILE_PATH = MODULE_DIR / "config.yml"

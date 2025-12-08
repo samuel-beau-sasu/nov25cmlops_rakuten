@@ -1,11 +1,11 @@
-from pathlib import Path
 import json
+from pathlib import Path
 import pickle
 
-import numpy as np
 from loguru import logger
+import numpy as np
 from scipy import sparse
-from sklearn.metrics import accuracy_score, f1_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, f1_score
 from sklearn.svm import LinearSVC
 
 from mlops_rakuten.entities import ModelTrainerConfig
@@ -102,9 +102,7 @@ class ModelTrainer:
 
         # 7. Sauvegarder un fichier de configuration lisible
         model_config_path = cfg.model_dir / "model_config.json"
-        logger.info(
-            f"Sauvegarde de la configuration du modèle vers : {model_config_path}"
-        )
+        logger.info(f"Sauvegarde de la configuration du modèle vers : {model_config_path}")
 
         model_config = {
             "model_type": cfg.model_type,
@@ -124,9 +122,7 @@ class ModelTrainer:
 
         # 8. Sauvegarder les métriques d'entraînement
         metrics_path = cfg.model_dir / "metrics_train.json"
-        logger.info(
-            f"Sauvegarde des métriques d'entraînement vers : {metrics_path}"
-        )
+        logger.info(f"Sauvegarde des métriques d'entraînement vers : {metrics_path}")
 
         metrics = {
             "train_accuracy": train_accuracy,
@@ -138,9 +134,7 @@ class ModelTrainer:
 
         # 9. Sauvegarder le rapport de classification texte
         cls_report_path = cfg.model_dir / "classification_report_train.txt"
-        logger.info(
-            f"Sauvegarde du rapport de classification (train) vers : {cls_report_path}"
-        )
+        logger.info(f"Sauvegarde du rapport de classification (train) vers : {cls_report_path}")
 
         with open(cls_report_path, "w") as f:
             f.write(cls_report)

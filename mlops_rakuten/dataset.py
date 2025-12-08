@@ -4,6 +4,7 @@ import typer
 from mlops_rakuten.pipelines.data_ingestion import DataIngestionPipeline
 from mlops_rakuten.pipelines.data_preprocessing import DataPreprocessingPipeline
 from mlops_rakuten.pipelines.data_transformation import DataTransformationPipeline
+from mlops_rakuten.pipelines.model_evaluation import ModelEvaluationPipeline
 from mlops_rakuten.pipelines.model_trainer import ModelTrainerPipeline
 
 app = typer.Typer()
@@ -38,6 +39,11 @@ def main():
     model_trainer_pipeline = ModelTrainerPipeline()
     model_path = model_trainer_pipeline.run()
     logger.success(f"Modèle entraîné disponible à : {model_path}")
+
+    # 5. Évaluation du modèle sur le jeu de validation
+    model_evaluation_pipeline = ModelEvaluationPipeline()
+    metrics_path = model_evaluation_pipeline.run()
+    logger.success(f"Métriques de validation disponibles dans : {metrics_path}")
 
 
 if __name__ == "__main__":

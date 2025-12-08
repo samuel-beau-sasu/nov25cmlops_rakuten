@@ -10,11 +10,13 @@ from mlops_rakuten.config import (
     MODELS_DIR,
     PROCESSED_DATA_DIR,
     RAW_DATA_DIR,
+    REPORTS_DIR,
 )
 from mlops_rakuten.entities import (
     DataIngestionConfig,
     DataPreprocessingConfig,
     DataTransformationConfig,
+    ModelEvaluationConfig,
     ModelTrainerConfig,
 )
 
@@ -151,4 +153,44 @@ class ConfigurationManager:
             C=c["C"],
             max_iter=c["max_iter"],
             use_class_weight=c["use_class_weight"],
+        )
+
+    def get_model_evaluation_config(self) -> ModelEvaluationConfig:
+        """
+        Construit un ModelEvaluationConfig à partir de la section
+        'model_evaluation' du YAML, en combinant avec PROCESSED_DATA_DIR / MODELS_DIR.
+
+        Cette configuration permet de :
+        - charger X_val / y_val transformés
+        - charger le modèle entraîné
+        - sauvegarder les métriques de validation et les rapports associés.
+        """
+        c = self._config["model_evaluation"]
+
+        X_val_path = PROCESSED_DATA_DIR / c["X_val_filename"]
+        y_val_path = PROCESSED_DATA_DIR / c["y_val_filename"]
+
+        model_dir = MODELS_DIR
+        model_path = model_dir / c["model_filename"]
+
+        metrics_dir = REPORTS_DIR
+        metrics_path = metrics_dir / c["metrics_filename"]
+        classification_report_path = metrics_dir / c["classification_report_filename"]
+        confusion_matrix_path = metrics_dir / c["confusion_matrix_filename"]
+
+        logger.debug(f"X_val_path resolved to: {X_val_path}")
+        logger.debug(f"y_val_path resolved to: {y_val_path}")
+        logger.debug(f"model_path resolved to: {model_path}")
+        logger.debug(f"metrics_path resolved to: {metrics_path}")
+        logger.debug(f"classification_report_path resolved to: {classification_report_path}")
+        logger.debug(f"confusion_matrix_path resolved to: {confusion_matrix_path}")
+
+        return ModelEvaluationConfig(
+            model_path=model_path,
+            X_val_path=X_val_path,
+            y_val_path=y_val_path,
+            metrics_path=metrics_path,
+            metrics_dir=metrics_dir,
+            classification_report_path=classification_report_path,
+            confusion_matrix_path=confusion_matrix_path,
         )

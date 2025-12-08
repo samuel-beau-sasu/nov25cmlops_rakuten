@@ -68,3 +68,15 @@ class ModelTrainerConfig:
     C: float
     max_iter: int
     use_class_weight: bool
+
+
+@dataclass
+class ModelEvaluationConfig:
+    model_path: Path
+    X_val_path: Path
+    y_val_path: Path
+
+    metrics_path: Path
+    metrics_dir: Path
+    classification_report_path: Path
+    confusion_matrix_path: Path
