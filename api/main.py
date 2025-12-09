@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Depends
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from pydantic import BaseModel, Field
-from typing import Dict, Optional, List
+from pydantic import BaseModel, Field, ConfigDict
+from typing import Dict, Optional, List, Any
 import pandas as pd
 import io
 import logging
@@ -9,6 +9,9 @@ from datetime import datetime
 import os
 import traceback
 import numpy as np
+
+
+#from mlops_rakuten.modeling.predict import main
 
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
@@ -47,11 +50,11 @@ class LoadResponse(BaseModel):
     message: str
     file_info: Optional[FileInfo] = None
     
-# NOUVEAU : Modèle étendu avec prédictions
+# NOUVEAU : Modèle étendu avec prédictions    
 class LoadAndTrainResponse(LoadResponse):
     training_completed: bool = Field(default=False)
-    #prediction_results: Optional[Dict[str, Any]] = None
-    #model_info: Optional[Dict[str, Any]] = None
+    prediction_results: Optional[Dict[str, Any]] = None
+    model_info: Optional[Dict[str, Any]] = None
     next_steps: Optional[List[str]] = None
 
 class FileStatus(BaseModel):
@@ -204,8 +207,8 @@ async def system_status():
 
 # ==================== ENDPOINTS ADMIN ====================
 
-@app.post("/admin/load-training", response_model=LoadResponse)
-async def load_training_data(
+#@app.post("/admin/load-training", response_model=LoadResponse)
+async def load_training_data_old(
     x_train_file: UploadFile = File(..., description="Fichier X_train.csv avec les features"),
     y_train_file: UploadFile = File(..., description="Fichier Y_train.csv avec les labels"),
     admin: str = Depends(authenticate_admin)
@@ -270,8 +273,8 @@ async def load_training_data(
         logger.error(f"Erreur lors du chargement des données: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erreur interne: {str(e)}")
 
-#@app.post("/admin/load-and-train", response_model=LoadAndTrainResponse)
-async def load_and_train_data_new(
+@app.post("/admin/load-and-train", response_model=LoadAndTrainResponse)
+async def load_and_train_data(
     x_train_file: UploadFile = File(..., description="Fichier X_train.csv"),
     y_train_file: UploadFile = File(..., description="Fichier Y_train.csv"),
     admin: str = Depends(authenticate_admin)

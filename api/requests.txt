@@ -12,9 +12,21 @@ source ~/.bashrc
 PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 source ~/.bashrc
 
+# On ajoute les librairies
+uv add uvicorn[standard]
+uv add pandas[standard]
+uv add python-multipart[standard]
+
+uv sync
+
 
 # demarrer l'appli dans le répertoire fastapi_exam_BEAU
 uvicorn main:app
+
+## GIT 
+git add .
+git commit -m "version 1"
+git push -u origin api
 
 # test de la page de bienvenue de l'appli
 curl -X 'GET' \
