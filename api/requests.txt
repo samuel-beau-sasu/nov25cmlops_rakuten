@@ -52,13 +52,22 @@ curl -X POST "http://localhost:8000/admin/load-training" \
   -F "x_train_file=@X_train.csv" \
   -F "y_train_file=@Y_train.csv"
 
+
+curl -X POST "http://localhost:8000/admin/load-and-train" \
+  -u admin:4dm1N \
+  -F "x_train_file=@data/raw/X_train.csv" \
+  -F "y_train_file=@data/raw/Y_train.csv"
+
+  
+  
+
 # 2. Vérifier le statut
 curl -u admin:4dm1N http://localhost:8000/admin/training-status
 
 # 3. Utilisateur charge un fichier de test
 curl -X POST "http://localhost:8000/upload-test" \
   -u alice:wonderland \
-  -F "test_file=@X_test_update.csv"
+  -F "test_file=@data/raw/X_test_update.csv"
 
 # 4. Voir ses fichiers
 curl -u alice:wonderland http://localhost:8000/user/files
