@@ -64,13 +64,16 @@ Product type classification for Rakuten France
 1. Vérifier si `uv` est installé, sinon [Installer uv](https://docs.astral.sh/uv/getting-started/installation/).
    `$ uv --version`
 
-2. Activer l'environnement Python (macOS / Linux)
+2. Installer l'environnement Python (macOS / Linux) à la racine du projet
+   `$ uv venv`
+
+3. Activer l'environnement Python (macOS / Linux)
    `$ source .venv/bin/activate`
 
-3. Installer les dépendances
+4. Installer les dépendances
    `$ make requirements`
 
-4. Vérifier que l'environnement est opérationnel
+5. Vérifier que l'environnement est opérationnel
    `$ python -c "import pandas, typer, mlops_rakuten; print('OK')"`
 
 ---

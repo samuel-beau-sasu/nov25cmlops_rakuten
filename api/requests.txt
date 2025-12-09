@@ -14,7 +14,7 @@ source ~/.bashrc
 
 
 # demarrer l'appli dans le répertoire fastapi_exam_BEAU
-uvicorn main:app --reload
+uvicorn main:app
 
 # test de la page de bienvenue de l'appli
 curl -X 'GET' \

@@ -50,8 +50,8 @@ class LoadResponse(BaseModel):
 # NOUVEAU : Modèle étendu avec prédictions
 class LoadAndTrainResponse(LoadResponse):
     training_completed: bool = Field(default=False)
-    prediction_results: Optional[Dict[str, Any]] = None
-    model_info: Optional[Dict[str, Any]] = None
+    #prediction_results: Optional[Dict[str, Any]] = None
+    #model_info: Optional[Dict[str, Any]] = None
     next_steps: Optional[List[str]] = None
 
 class FileStatus(BaseModel):
@@ -286,11 +286,11 @@ async def load_and_train_data_new(
     y_train_df = validate_csv(y_train_file, required_columns=['prdtypecode'])
     
     # Vérifier la correspondance des lignes
-        if len(x_train_df) != len(y_train_df):
-            raise HTTPException(
-                status_code=400,
-                detail=f"Les fichiers n'ont pas le même nombre de lignes. X_train: {len(x_train_df)}, Y_train: {len(y_train_df)}"
-            )
+    if len(x_train_df) != len(y_train_df):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Les fichiers n'ont pas le même nombre de lignes. X_train: {len(x_train_df)}, Y_train: {len(y_train_df)}"
+        )
 
     # Stocker les données
     training_data["X_train"] = x_train_df
@@ -463,81 +463,6 @@ async def upload_test_file(
         logger.error(f"Erreur lors du chargement du fichier test: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erreur interne: {str(e)}")
 
- 
-#@app.get("/user/files")     
-async def get_user_files_old(user: str = Depends(authenticate_user)):
-    """
-    Liste les fichiers de test chargés par l'utilisateur.
-    """
-    if user not in user_test_files:
-        return {
-            "user": user,
-            "files": [],
-            "message": "Aucun fichier chargé"
-        }
-    
-    user_file = user_test_files[user]
-    
-    # Information détaillée sur le fichier
-    file_info = {
-        "filename": user_file["filename"],
-        "upload_time": user_file["upload_time"],
-        "rows": len(user_file["data"]),
-        "columns": list(user_file["data"].columns),
-        "file_size_kb": round(user_file["file_size_bytes"] / 1024, 2),
-        "sample_data": user_file["data"].head(3).to_dict(orient='records')
-    }
-    
-    return {
-        "user": user,
-        "files": [file_info],
-        "total_files": 1
-    }
-
-#@app.get("/user/files")
-async def get_user_files_old2(user: str = Depends(authenticate_user)):
-    """
-    Liste les fichiers de test chargés par l'utilisateur.
-    """
-    try:
-        logger.info(f"Accès à /user/files par l'utilisateur: {user}")
-        
-        if user not in user_test_files:
-            logger.info(f"Utilisateur {user} n'a pas de fichiers")
-            return {
-                "user": user,
-                "files": [],
-                "message": "Aucun fichier chargé"
-            }
-        
-        user_file = user_test_files[user]
-        logger.info(f"Fichier trouvé pour {user}: {user_file['filename']}")
-        
-        # Information détaillée sur le fichier
-        file_info = {
-            "filename": user_file["filename"],
-            "upload_time": user_file["upload_time"],
-            "rows": len(user_file["data"]),
-            "columns": list(user_file["data"].columns),
-            "file_size_kb": round(user_file["file_size_bytes"] / 1024, 2),
-            "sample_data": user_file["data"].head(3).to_dict(orient='records')
-        }
-        
-        logger.info(f"Réponse préparée pour {user}")
-        return {
-            "user": user,
-            "files": [file_info],
-            "total_files": 1
-        }
-        
-    except Exception as e:
-        logger.error(f"Erreur dans /user/files pour {user}: {str(e)}")
-        logger.error(traceback.format_exc())
-        raise HTTPException(
-            status_code=500,
-            detail=f"Erreur interne: {str(e)}"
-        )
-
 @app.get("/user/files")
 async def get_user_files(user: str = Depends(authenticate_user)):
     """Liste les fichiers de test chargés par l'utilisateur."""
@@ -574,60 +499,6 @@ async def get_user_files(user: str = Depends(authenticate_user)):
         "files": [file_info],
         "total_files": 1
     }
-
-#@app.get("/user/test-stats")
-async def get_test_stats_old(user: str = Depends(authenticate_user)):
-    """
-    Statistiques sur le fichier de test de l'utilisateur.
-    """
-    if user not in user_test_files:
-        raise HTTPException(
-            status_code=404,
-            detail="Aucun fichier de test chargé"
-        )
-    
-    test_df = user_test_files[user]["data"]
-    
-    stats = {
-        "filename": user_test_files[user]["filename"],
-        "basic_stats": {
-            "total_rows": len(test_df),
-            "total_columns": len(test_df.columns),
-            "column_names": list(test_df.columns)
-        },
-        "column_info": {},
-        "sample_records": test_df.head(5).to_dict(orient='records')
-    }
-    
-    # Statistiques par colonne
-    for column in test_df.columns:
-        col_stats = {
-            "dtype": str(test_df[column].dtype),
-            "unique_values": test_df[column].nunique(),
-            "missing_values": test_df[column].isnull().sum(),
-            "missing_percentage": round((test_df[column].isnull().sum() / len(test_df)) * 100, 2)
-        }
-        
-        # Stats spécifiques pour les colonnes numériques
-        if pd.api.types.is_numeric_dtype(test_df[column]):
-            col_stats.update({
-                "min": float(test_df[column].min()),
-                "max": float(test_df[column].max()),
-                "mean": float(test_df[column].mean()),
-                "std": float(test_df[column].std())
-            })
-        
-        # Stats spécifiques pour les colonnes textuelles
-        if pd.api.types.is_string_dtype(test_df[column]):
-            col_stats.update({
-                "avg_length": float(test_df[column].str.len().mean()),
-                "max_length": int(test_df[column].str.len().max()),
-                "min_length": int(test_df[column].str.len().min())
-            })
-        
-        stats["column_info"][column] = col_stats
-    
-    return stats
 
 @app.get("/user/test-stats")
 async def get_test_stats(user: str = Depends(authenticate_user)):
