@@ -1,0 +1,53 @@
+# Type de shell utilisé
+echo $SHELL
+
+# Activation de l'environnement virtuel
+source .venv/bin/activate
+
+# 
+export PS1='(\u) \W\$ '
+source ~/.bashrc
+
+#
+PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+source ~/.bashrc
+
+
+# demarrer l'appli dans le répertoire fastapi_exam_BEAU
+uvicorn main:app --reload
+
+# test de la page de bienvenue de l'appli
+curl -X 'GET' \
+  'http://localhost:8000/' \
+  -H 'accept: application/json'
+
+# On génére les credentials en Base64 (YWxpY2U6d29uZGVybGFuZA==)
+# pour l'ajouter dans  l'authentification de génération du quiz 
+echo -n "alice:wonderland" | base64
+
+# 1.
+curl -u admin:4dm1N http://localhost:8000/admin/training-status
+
+# 1. Admin charge les données d'entraînement
+curl -X POST "http://localhost:8000/admin/load-training" \
+  -u admin:4dm1N \
+  -F "x_train_file=@X_train.csv" \
+  -F "y_train_file=@Y_train.csv"
+
+# 2. Vérifier le statut
+curl -u admin:4dm1N http://localhost:8000/admin/training-status
+
+# 3. Utilisateur charge un fichier de test
+curl -X POST "http://localhost:8000/upload-test" \
+  -u alice:wonderland \
+  -F "test_file=@X_test_update.csv"
+
+# 4. Voir ses fichiers
+curl -u alice:wonderland http://localhost:8000/user/files
+
+curl -X 'GET' \
+  'http://localhost:8000/user/files' \
+  -u alice:wonderland \
+  -H 'accept: application/json'
+
+
