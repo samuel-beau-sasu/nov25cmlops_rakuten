@@ -22,6 +22,12 @@ uv sync
 
 # demarrer l'appli dans le répertoire fastapi_exam_BEAU
 uvicorn main:app
+uv run uvicorn api.main:app
+
+# lien 
+http://localhost:8000/docs
+
+ "admin": "4dm1N"
 
 ## GIT 
 git add .
