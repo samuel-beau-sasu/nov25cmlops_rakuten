@@ -4,10 +4,6 @@ from pathlib import Path
 from loguru import logger
 import yaml
 
-<<<<<<< HEAD
-from mlops_rakuten.config import CONFIG_FILE_PATH, PROCESSED_DATA_DIR, RAW_DATA_DIR
-from mlops_rakuten.entities import DataIngestionConfig
-=======
 from mlops_rakuten.config import (
     CONFIG_FILE_PATH,
     INTERIM_DATA_DIR,
@@ -24,7 +20,6 @@ from mlops_rakuten.entities import (
     ModelTrainerConfig,
     PredictionConfig,
 )
->>>>>>> origin/development
 
 
 class ConfigurationManager:
@@ -44,21 +39,13 @@ class ConfigurationManager:
     def get_data_ingestion_config(self) -> DataIngestionConfig:
         """
         Construit un DataIngestionConfig à partir de la section
-<<<<<<< HEAD
-        'data_ingestion' du YAML, en combinant avec RAW_DATA_DIR / PROCESSED_DATA_DIR.
-=======
         'data_ingestion' du YAML, en combinant avec RAW_DATA_DIR / INTERIM_DATA_DIR.
->>>>>>> origin/development
         """
         c = self._config["data_ingestion"]
 
         x_path = RAW_DATA_DIR / c["x_train_filename"]
         y_path = RAW_DATA_DIR / c["y_train_filename"]
-<<<<<<< HEAD
-        output_path = PROCESSED_DATA_DIR / c["output_dataset_filename"]
-=======
         output_path = INTERIM_DATA_DIR / c["output_dataset_filename"]
->>>>>>> origin/development
 
         logger.debug(f"x_train_path resolved to: {x_path}")
         logger.debug(f"y_train_path resolved to: {y_path}")
@@ -69,8 +56,6 @@ class ConfigurationManager:
             y_train_path=y_path,
             output_path=output_path,
         )
-<<<<<<< HEAD
-=======
 
     def get_data_preprocessing_config(self) -> DataPreprocessingConfig:
         """
@@ -237,4 +222,3 @@ class ConfigurationManager:
             model_path=model_path,
             text_column=c["text_column"],
         )
->>>>>>> origin/development

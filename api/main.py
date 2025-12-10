@@ -11,7 +11,7 @@ import traceback
 import numpy as np
 
 
-from mlops_rakuten.main import train  # Importer la fonction
+
 
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
@@ -206,72 +206,6 @@ async def system_status():
     }
 
 # ==================== ENDPOINTS ADMIN ====================
-
-#@app.post("/admin/load-training", response_model=LoadResponse)
-async def load_training_data_old(
-    x_train_file: UploadFile = File(..., description="Fichier X_train.csv avec les features"),
-    y_train_file: UploadFile = File(..., description="Fichier Y_train.csv avec les labels"),
-    admin: str = Depends(authenticate_admin)
-    ):
-    """
-    Charge les données d'entraînement (admin uniquement).
-    
-    - X_train.csv : doit contenir les colonnes 'designation', 'description', 'productid', 'imageid'
-    - Y_train.csv : doit contenir la colonne 'prdtypecode'
-    """
-    try:
-        logger.info(f"Chargement des données d'entraînement par l'admin: {admin}")
-        
-        # Valider et lire X_train.csv
-        logger.info(f"Validation de {x_train_file.filename}...")
-        x_train_df = validate_csv(
-            x_train_file, 
-            required_columns=['designation', 'description', 'productid', 'imageid']
-        )
-        
-        # Valider et lire Y_train.csv
-        logger.info(f"Validation de {y_train_file.filename}...")
-        y_train_df = validate_csv(
-            y_train_file,
-            required_columns=['prdtypecode']
-        )
-        
-        # Vérifier la correspondance des lignes
-        if len(x_train_df) != len(y_train_df):
-            raise HTTPException(
-                status_code=400,
-                detail=f"Les fichiers n'ont pas le même nombre de lignes. X_train: {len(x_train_df)}, Y_train: {len(y_train_df)}"
-            )
-        
-        # Stocker les données
-        training_data["X_train"] = x_train_df
-        training_data["Y_train"] = y_train_df
-        
-        # Calculer la taille des fichiers
-        x_train_size = len(x_train_file.file.read()) / 1024 if hasattr(x_train_file.file, 'read') else 0
-        
-        file_info = FileInfo(
-            filename=f"{x_train_file.filename}, {y_train_file.filename}",
-            upload_time=datetime.now().isoformat(),
-            rows=len(x_train_df),
-            columns=list(x_train_df.columns) + list(y_train_df.columns),
-            file_size_kb=round(x_train_size, 2)
-        )
-        
-        logger.info(f"Données d'entraînement chargées avec succès: {len(x_train_df)} lignes")
-        
-        
-        return LoadResponse(
-            status="success",
-            message=f"Données d'entraînement chargées avec succès. {len(x_train_df)} échantillons.",
-            file_info=file_info
-        )
-            
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Erreur lors du chargement des données: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Erreur interne: {str(e)}")
 
 @app.post("/admin/load-and-train", response_model=LoadAndTrainResponse)
 async def load_and_train_data(

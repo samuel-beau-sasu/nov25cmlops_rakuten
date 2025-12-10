@@ -1,7 +1,4 @@
 from pathlib import Path
-<<<<<<< HEAD
-from mlops_rakuten.pipelines.data_ingestion import DataIngestionPipeline
-=======
 
 from mlops_rakuten.pipelines.data_ingestion import DataIngestionPipeline
 from mlops_rakuten.pipelines.data_preprocessing import DataPreprocessingPipeline
@@ -12,7 +9,6 @@ from mlops_rakuten.pipelines.model_evaluation import ModelEvaluationPipeline
 # ---------------------------
 # Dummy Steps
 # ---------------------------
->>>>>>> origin/development
 
 
 class DummyDataIngestionStep:
@@ -20,16 +16,6 @@ class DummyDataIngestionStep:
         self.config = config
 
     def run(self) -> Path:
-<<<<<<< HEAD
-        return Path("/fake/path/dataset.csv")
-
-
-def test_data_ingestion_pipeline_calls_step(monkeypatch):
-    from mlops_rakuten import pipelines
-    from mlops_rakuten import config_manager
-
-    # Monkeypatch DataIngestion pour le remplacer par DummyStep
-=======
         return Path("/fake/path/ingested_dataset.csv")
 
 
@@ -74,7 +60,6 @@ def test_data_ingestion_pipeline_calls_step(monkeypatch):
     Vérifie que DataIngestionPipeline utilise bien la classe DataIngestion
     et retourne le chemin prévu.
     """
->>>>>>> origin/development
     monkeypatch.setattr(
         "mlops_rakuten.pipelines.data_ingestion.DataIngestion",
         DummyDataIngestionStep,
@@ -83,9 +68,6 @@ def test_data_ingestion_pipeline_calls_step(monkeypatch):
     pipeline = DataIngestionPipeline()
     output = pipeline.run()
 
-<<<<<<< HEAD
-    assert output == Path("/fake/path/dataset.csv")
-=======
     assert output == Path("/fake/path/ingested_dataset.csv")
 
 
@@ -153,4 +135,3 @@ def test_model_evaluation_pipeline_calls_step(monkeypatch):
     output = pipeline.run()
 
     assert output == Path("/fake/path/metrics_val.json")
->>>>>>> origin/development

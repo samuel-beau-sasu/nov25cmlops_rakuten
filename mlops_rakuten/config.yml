@@ -1,9 +1,4 @@
 data_ingestion:
-<<<<<<< HEAD
-  x_train_filename: "X_train_update.csv"
-  y_train_filename: "Y_train_CVw08PX.csv"
-  output_dataset_filename: "dataset.csv"
-=======
   # Fichiers d'entrée / sortie
   x_train_filename: "X_train_update.csv"
   y_train_filename: "Y_train_CVw08PX.csv"
@@ -96,4 +91,3 @@ prediction:
 
   # Colonnes / champs
   text_column: "designation"
->>>>>>> origin/development
