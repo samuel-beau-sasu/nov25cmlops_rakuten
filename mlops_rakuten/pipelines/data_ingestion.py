@@ -3,7 +3,11 @@ from pathlib import Path
 from loguru import logger
 
 from mlops_rakuten.config_manager import ConfigurationManager
+<<<<<<< HEAD
 from mlops_rakuten.modeling.data_ingestion import DataIngestion
+=======
+from mlops_rakuten.modules.data_ingestion import DataIngestion
+>>>>>>> origin/development
 
 
 class DataIngestionPipeline:

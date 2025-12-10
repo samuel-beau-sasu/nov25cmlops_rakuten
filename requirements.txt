@@ -100,3 +100,22 @@ Werkzeug==3.0.1
 wheel==0.42.0
 wsproto==1.2.0
 zope.interface==6.1
+dotenv
+ipython
+jupyterlab
+loguru
+matplotlib
+mkdocs
+notebook
+numpy
+pandas
+pip
+pytest
+python-box
+python-dotenv
+pyyaml
+ruff
+scikit-learn
+tqdm
+typer
+-e .

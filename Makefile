@@ -74,10 +74,16 @@ create_environment:
 #################################################################################
 
 
-## Make dataset
-.PHONY: data
-data: requirements
-	$(PYTHON_INTERPRETER) mlops_rakuten/dataset.py
+## Train model
+.PHONY: train
+train: requirements
+	$(PYTHON_INTERPRETER) mlops_rakuten/main.py train
+
+
+## Make prediction
+.PHONY: predict
+predict: requirements
+	$(PYTHON_INTERPRETER) mlops_rakuten/main.py predict "$(TEXT)"
 
 
 #################################################################################

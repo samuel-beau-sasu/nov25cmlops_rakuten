@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 
 from mlops_rakuten.entities import DataIngestionConfig
-from mlops_rakuten.modeling.data_ingestion import DataIngestion
+from mlops_rakuten.modules.data_ingestion import DataIngestion
 
 
 def test_data_ingestion_merges_X_and_y(tmp_path):
