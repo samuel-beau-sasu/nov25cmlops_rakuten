@@ -11,7 +11,7 @@ import traceback
 import numpy as np
 
 
-#from mlops_rakuten.modeling.predict import main
+from mlops_rakuten.main import train  # Importer la fonction
 
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
@@ -303,8 +303,8 @@ async def load_and_train_data(
     x_train_size = len(x_train_file.file.read()) / 1024 if hasattr(x_train_file.file, 'read') else 0
     
     # 2. Entraînement du modèle
-    #obj = PredictionPipeline()
-    #prediction = obj.predict(data)
+    training_results = train()
+
     
     
     # 4. Retour combiné
