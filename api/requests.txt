@@ -16,6 +16,11 @@ source ~/.bashrc
 uv add uvicorn[standard]
 uv add pandas[standard]
 uv add python-multipart[standard]
+uv add loguru[standard]
+uv add typer[standard]
+uv add scipy[standard]
+uv add scikit-learn[standard]
+
 
 uv sync
 
@@ -23,6 +28,7 @@ uv sync
 # demarrer l'appli dans le répertoire fastapi_exam_BEAU
 uvicorn main:app
 uv run uvicorn api.main:app
+uv run uvicorn api.new_main:app
 
 # lien 
 http://localhost:8000/docs
@@ -49,15 +55,15 @@ curl -u admin:4dm1N http://localhost:8000/admin/training-status
 # 1. Admin charge les données d'entraînement
 curl -X POST "http://localhost:8000/admin/load-training" \
   -u admin:4dm1N \
-  -F "x_train_file=@X_train.csv" \
-  -F "y_train_file=@Y_train.csv"
+  -F "x_train_file=@data/raw/X_train_update.csv" \
+  -F "y_train_file=@data/raw/Y_train_CVw08PX.csv"
+
 
 
 curl -X POST "http://localhost:8000/admin/load-and-train" \
   -u admin:4dm1N \
-  -F "x_train_file=@data/raw/X_train.csv" \
-  -F "y_train_file=@data/raw/Y_train.csv"
-
+  -F "x_train_file=@data/raw/X_train_update.csv" \
+  -F "y_train_file=@data/raw/Y_train_CVw08PX.csv"
   
   
 

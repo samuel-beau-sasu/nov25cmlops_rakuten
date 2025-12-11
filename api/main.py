@@ -237,7 +237,7 @@ async def load_and_train_data(
     x_train_size = len(x_train_file.file.read()) / 1024 if hasattr(x_train_file.file, 'read') else 0
     
     # 2. Entraînement du modèle
-    training_results = train()
+    #training_results = train()
 
     
     
