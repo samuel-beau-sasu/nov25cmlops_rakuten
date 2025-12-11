@@ -7,7 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import LinearSVC
 
-from mlops_rakuten.entities import PredictionConfig
+from mlops_rakuten.config.entities import PredictionConfig
 from mlops_rakuten.pipelines.prediction import PredictionPipeline
 
 
@@ -88,8 +88,3 @@ def test_prediction_pipeline_returns_decoded_labels(tmp_path, monkeypatch):
     assert isinstance(preds, list)
     assert len(preds) == 1
     assert preds[0] in set(prdtypecodes)
-
-    # Sanity check : pour un texte "dress", on s'attend plutôt à la classe 10
-    # (pas strictement garanti, mais très probable)
-    # Donc on peut l'exprimer de manière souple :
-    # assert preds[0] == 10

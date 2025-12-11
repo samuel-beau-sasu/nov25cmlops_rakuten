@@ -6,7 +6,7 @@ import numpy as np
 from scipy import sparse
 from sklearn.svm import LinearSVC
 
-from mlops_rakuten.entities import ModelEvaluationConfig
+from mlops_rakuten.config.entities import ModelEvaluationConfig
 from mlops_rakuten.modules.model_evaluation import ModelEvaluation
 from mlops_rakuten.utils import create_directories
 

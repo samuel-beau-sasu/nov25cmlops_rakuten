@@ -6,7 +6,7 @@ import pickle
 import numpy as np
 from scipy import sparse
 
-from mlops_rakuten.entities import ModelTrainerConfig
+from mlops_rakuten.config.entities import ModelTrainerConfig
 from mlops_rakuten.modules.model_trainer import ModelTrainer
 
 

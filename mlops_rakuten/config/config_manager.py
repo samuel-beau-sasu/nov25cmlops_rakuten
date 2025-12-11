@@ -4,7 +4,7 @@ from pathlib import Path
 from loguru import logger
 import yaml
 
-from mlops_rakuten.config import (
+from mlops_rakuten.config.constants import (
     CONFIG_FILE_PATH,
     INTERIM_DATA_DIR,
     MODELS_DIR,
@@ -12,7 +12,7 @@ from mlops_rakuten.config import (
     RAW_DATA_DIR,
     REPORTS_DIR,
 )
-from mlops_rakuten.entities import (
+from mlops_rakuten.config.entities import (
     DataIngestionConfig,
     DataPreprocessingConfig,
     DataTransformationConfig,
@@ -199,7 +199,7 @@ class ConfigurationManager:
     def get_prediction_config(self) -> PredictionConfig:
         """
         Construit un PredictionConfig à partir de la section
-        'prediction' du YAML, en combinant avec PROCESSED_DATA_DIR / MODELS_DIR.
+        'prediction' du YAML, en combinant avec PROCESSED_DATA_DIR / MODELS_DIR / RAW_DATA_DIR.
 
         Cette configuration permet de :
         - recharger le vectorizer TF-IDF
@@ -212,13 +212,25 @@ class ConfigurationManager:
         label_encoder_path = PROCESSED_DATA_DIR / c["label_encoder_filename"]
         model_path = MODELS_DIR / c["model_filename"]
 
+        categories_path = None
+        code_col = None
+        name_col = None
+        if "categories_filename" in c:
+            categories_path = RAW_DATA_DIR / c["categories_filename"]
+            code_col = c.get("category_code_column", "prdtypecode")
+            name_col = c.get("category_name_column", "category_name")
+
         logger.debug(f"vectorizer_path resolved to: {vectorizer_path}")
         logger.debug(f"label_encoder_path resolved to: {label_encoder_path}")
         logger.debug(f"model_path resolved to: {model_path}")
+        logger.debug(f"categories_path resolved to: {categories_path}")
 
         return PredictionConfig(
             vectorizer_path=vectorizer_path,
             label_encoder_path=label_encoder_path,
             model_path=model_path,
             text_column=c["text_column"],
+            categories_path=categories_path,
+            category_code_column=code_col,
+            category_name_column=name_col,
         )

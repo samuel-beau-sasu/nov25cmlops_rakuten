@@ -3,7 +3,7 @@ from pathlib import Path
 from loguru import logger
 import pandas as pd
 
-from mlops_rakuten.entities import DataPreprocessingConfig
+from mlops_rakuten.config.entities import DataPreprocessingConfig
 from mlops_rakuten.utils import create_directories
 
 

@@ -20,7 +20,7 @@ data_preprocessing:
 
   # règles sur les outliers de texte
   min_char_length: 10  # trop court → on supprime
-  max_char_length: 1000  # trop long → on supprime ou tronque
+  max_char_length: 200  # trop long → on supprime ou tronque
   min_alpha_ratio: 0.2  # au moins 20% de lettres dans le texte
 
 data_transformation:
@@ -63,7 +63,7 @@ model_trainer:
   y_train_filename: "y_train.npy"
 
   # Type de modèle
-  model_type: "linear_svc"   # pour l'instant on ne gère que celui-ci
+  model_type: "logistic_regression"  # au lieu de "linear_svc"
 
   # Hyperparamètres du modèle
   C: 1.0
@@ -91,3 +91,8 @@ prediction:
 
   # Colonnes / champs
   text_column: "designation"
+
+  # mapping prdtypecode -> category_name
+  categories_filename: "product_categories.csv"
+  category_code_column: "prdtypecode"
+  category_name_column: "category_name"

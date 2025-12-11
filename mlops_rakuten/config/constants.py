@@ -7,7 +7,7 @@ from loguru import logger
 load_dotenv()
 
 # Paths
-PROJ_ROOT = Path(__file__).resolve().parents[1]
+PROJ_ROOT = Path(__file__).resolve().parents[2]
 logger.info(f"PROJ_ROOT path is: {PROJ_ROOT}")
 
 DATA_DIR = PROJ_ROOT / "data"
@@ -21,7 +21,12 @@ MODELS_DIR = PROJ_ROOT / "models"
 REPORTS_DIR = PROJ_ROOT / "reports"
 
 MODULE_DIR = PROJ_ROOT / "mlops_rakuten"
-CONFIG_FILE_PATH = MODULE_DIR / "config.yml"
+CONFIG_DIR = MODULE_DIR / "config"
+CONFIG_FILE_PATH = CONFIG_DIR / "config.yml"
+
+logger.info(f"MODULE_DIR is {MODULE_DIR}")
+logger.info(f"CONFIG_DIR is {CONFIG_DIR}")
+logger.info(f"CONFIG_FILE_PATH is {CONFIG_FILE_PATH}")
 
 # If tqdm is installed, configure loguru with tqdm.write
 # https://github.com/Delgan/loguru/issues/135

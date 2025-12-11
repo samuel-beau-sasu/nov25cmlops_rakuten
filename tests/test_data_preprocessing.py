@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from mlops_rakuten.entities import DataPreprocessingConfig
+from mlops_rakuten.config.entities import DataPreprocessingConfig
 from mlops_rakuten.modules.data_preprocessing import DataPreprocessing
 
 

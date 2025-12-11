@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from scipy import sparse
 
-from mlops_rakuten.entities import DataTransformationConfig
+from mlops_rakuten.config.entities import DataTransformationConfig
 from mlops_rakuten.modules.data_transformation import DataTransformation
 
 

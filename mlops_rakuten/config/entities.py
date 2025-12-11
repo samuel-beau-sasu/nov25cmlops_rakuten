@@ -89,3 +89,7 @@ class PredictionConfig:
     model_path: Path
 
     text_column: str
+
+    categories_path: Path
+    category_code_column: str
+    category_name_column: str

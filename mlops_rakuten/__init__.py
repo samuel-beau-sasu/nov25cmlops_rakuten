@@ -1,1 +1,1 @@
-from mlops_rakuten import config  # noqa: F401
+from mlops_rakuten.config import constants  # noqa: F401

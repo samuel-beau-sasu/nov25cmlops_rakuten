@@ -2,7 +2,7 @@
 import pandas as pd
 from pathlib import Path
 
-from mlops_rakuten.entities import DataIngestionConfig
+from mlops_rakuten.config.entities import DataIngestionConfig
 from mlops_rakuten.modules.data_ingestion import DataIngestion
 
 
