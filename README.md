@@ -47,15 +47,16 @@ Product type classification for Rakuten France
     │
     ├── __init__.py             <- Makes mlops_rakuten a Python module
     │
-    ├── config_manager.py       <- Create Config objects
-    │
-    ├── config.py               <- Store useful variables and configuration
-    │
-    ├── config.yml              <- Parameters for Config objects
+    ├── app.py                  <- FastAPI endpoints
     │
     ├── main.py                 <- Scripts to train model or make prediction
     │
-    ├── entities.py             <- Modules used to process data and train model
+    ├── config
+    │   ├── __init__.py
+    │   ├── config_manager.py       <- Create Config objects
+    │   ├── config.yml              <- Parameters for Config objects
+    │   ├── constants.py               <- Store useful variables and configuration
+    │   └── entities.py             <- Modules used to process data and train model
     │
     ├── modules
     │   ├── __init__.py
@@ -139,6 +140,16 @@ Exécuter la Pipeline pour entrainer le modèle
 
 Exécuter la Pipeline pour une inférence
    `$ make predict TEXT="Très joli pull pour enfants"`
+
+---
+
+## Application FastAPI
+
+Lancer l'application FastAPI
+   `$ .venv/bin/python -m uvicorn mlops_rakuten.api:app --reload`
+
+Pour accéder à l'API
+   [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ---
 
