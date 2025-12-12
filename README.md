@@ -21,9 +21,10 @@ Product type classification for Rakuten France
 │
 ├── models             <- Trained and serialized models, model predictions, or model summaries
 │
-├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-│                         the creator's initials, and a short `-` delimited description, e.g.
-│                         `1.0-jqp-initial-data-exploration`.
+├── notebooks          
+│   └── 01_exploration.ipynb  <- Text data exploration
+│                         
+│                         
 │
 ├── pyproject.toml     <- Project configuration file with package metadata for
 │                         mlops_rakuten and configuration for tools like black
