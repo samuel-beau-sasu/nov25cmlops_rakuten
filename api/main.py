@@ -10,6 +10,8 @@ import os
 import traceback
 import numpy as np
 
+# ✅ Import de votre fonction de training 
+from mlops_rakuten.main import train, predict
 
 
 
