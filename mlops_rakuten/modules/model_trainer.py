@@ -105,6 +105,7 @@ class ModelTrainer:
         logger.info(f"Sauvegarde de la configuration du modèle vers : {model_config_path}")
 
         model_config = {
+            "data_version": cfg.data_version,
             "model_type": cfg.model_type,
             "params": {
                 "C": cfg.C,

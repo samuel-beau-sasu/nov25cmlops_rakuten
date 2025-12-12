@@ -1,7 +1,34 @@
+global:
+  data_version: "v3.0"
+
+
+data_versioning:
+  # DVC remote storage a configurer
+  source_x_train: "X_train_update.csv"
+  source_y_train: "Y_train_CVw08PX.csv"
+
+  #version que l'on va créer artificiellement
+  versions:
+    - name: "v1.0"
+      split_ratio: 0.60
+      description: "Baseline dataset - 60% des données, équilibré"
+      apply_drift: false
+      
+    - name: "v2.0"
+      split_ratio: 0.85
+      description: "Croissance naturelle - +25%, drift léger"
+      apply_drift: "light"
+      
+    - name: "v3.0"
+      split_ratio: 1.0
+      description: "Drift significatif - +15%, changement distribution"
+      apply_drift: "strong"
+
 data_ingestion:
+
   # Fichiers d'entrée / sortie
-  x_train_filename: "X_train_update.csv"
-  y_train_filename: "Y_train_CVw08PX.csv"
+  x_train_filename: "X_train.csv"
+  y_train_filename: "Y_train.csv"
   output_dataset_filename: "ingested_dataset.csv"
 
 data_preprocessing:

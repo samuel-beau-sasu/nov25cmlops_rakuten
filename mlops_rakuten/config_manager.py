@@ -11,6 +11,7 @@ from mlops_rakuten.config import (
     PROCESSED_DATA_DIR,
     RAW_DATA_DIR,
     REPORTS_DIR,
+    VERSIONS_DATA_DIR
 )
 from mlops_rakuten.entities import (
     DataIngestionConfig,
@@ -19,6 +20,7 @@ from mlops_rakuten.entities import (
     ModelEvaluationConfig,
     ModelTrainerConfig,
     PredictionConfig,
+    DataVersioningConfig
 )
 
 
@@ -36,15 +38,55 @@ class ConfigurationManager:
         with open(config_path, "r") as f:
             self._config = yaml.safe_load(f)
 
+        self.global_version = self._config["global"]["data_version"]
+        logger.debug(f"Version data initialisé à la version: {self.global_version}")
+
+    def get_data_versioning_configs(self) -> list[DataVersioningConfig]:
+        """
+        Retourne une liste de DataVersioningConfig pour toutes les versions
+        définies dans config.yml.
+        """
+        config = self._config["data_versioning"]
+
+        source_x = RAW_DATA_DIR / config["source_x_train"]
+        source_y = RAW_DATA_DIR / config["source_y_train"]
+
+        versioning_configs = []
+
+        for version_spec in config["versions"]:
+            version_name = version_spec["name"]
+            version_dir = VERSIONS_DATA_DIR / version_name
+
+            cfg = DataVersioningConfig(
+                source_x_train_path=source_x,
+                source_y_train_path=source_y,
+                version_name=version_name,
+                split_ratio=version_spec["split_ratio"],
+                description=version_spec["description"],
+                apply_drift=version_spec["apply_drift"],
+                output_x_path=version_dir / "X_train.csv",
+                output_y_path=version_dir / "Y_train.csv",
+                output_metadata_path=version_dir / "metadata.json",
+            )
+            versioning_configs.append(cfg)
+
+        logger.debug(f"Loaded {len(versioning_configs)} versioning configs")
+        return versioning_configs
+
     def get_data_ingestion_config(self) -> DataIngestionConfig:
         """
         Construit un DataIngestionConfig à partir de la section
-        'data_ingestion' du YAML, en combinant avec RAW_DATA_DIR / INTERIM_DATA_DIR.
+        'data_ingestion' du YAML.
+        
+        MODIFIÉ : Charge depuis data/versions/{data_version}/ au lieu de data/raw/
         """
         c = self._config["data_ingestion"]
-
-        x_path = RAW_DATA_DIR / c["x_train_filename"]
-        y_path = RAW_DATA_DIR / c["y_train_filename"]
+        
+        # Récupérer la version choisie
+        version_dir = VERSIONS_DATA_DIR / self.global_version
+        
+        x_path = version_dir / c["x_train_filename"]
+        y_path = version_dir / c["y_train_filename"]
         output_path = INTERIM_DATA_DIR / c["output_dataset_filename"]
 
         logger.debug(f"x_train_path resolved to: {x_path}")
@@ -52,6 +94,7 @@ class ConfigurationManager:
         logger.debug(f"output_path resolved to: {output_path}")
 
         return DataIngestionConfig(
+            data_version=self.global_version, 
             x_train_path=x_path,
             y_train_path=y_path,
             output_path=output_path,
@@ -146,6 +189,7 @@ class ConfigurationManager:
         logger.debug(f"y_train_path resolved to: {y_train_path}")
 
         return ModelTrainerConfig(
+            data_version=self.global_version,
             model_path=model_path,
             model_dir=model_dir,
             X_train_path=X_train_path,

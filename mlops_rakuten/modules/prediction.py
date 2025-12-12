@@ -1,8 +1,6 @@
-from typing import List
-
 import pickle
+
 from loguru import logger
-import numpy as np
 
 from mlops_rakuten.entities import PredictionConfig
 
@@ -29,8 +27,7 @@ class Prediction:
         with open(cfg.vectorizer_path, "rb") as f:
             self.vectorizer = pickle.load(f)
 
-        logger.info(
-            f"Chargement du LabelEncoder depuis : {cfg.label_encoder_path}")
+        logger.info(f"Chargement du LabelEncoder depuis : {cfg.label_encoder_path}")
         with open(cfg.label_encoder_path, "rb") as f:
             self.label_encoder = pickle.load(f)
 
@@ -64,6 +61,6 @@ class Prediction:
         # 3. Décodage vers les prdtypecode d'origine
         y_pred = self.label_encoder.inverse_transform(y_pred_encoded)
 
-        preds = y_pred.tolist()   # conversion propre → LIST
+        preds = y_pred.tolist()  # conversion propre → LIST
 
         return preds

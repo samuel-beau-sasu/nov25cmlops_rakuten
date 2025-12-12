@@ -67,7 +67,38 @@ create_environment:
 	@echo ">>> Unix/macOS: source ./.venv/bin/activate"
 	
 
+#################################################################################
+# DATA VERSIONING                                                               #
+#################################################################################
 
+## Create data versions (v1.0, v2.0, v3.0) - ONE TIME ONLY
+.PHONY: create-versions
+create-versions:
+	@echo " Creating data versions..."
+	$(PYTHON_INTERPRETER) -m mlops_rakuten.main create-versions
+	@echo " Data versions created in data/versions/"
+
+## Show information about current data version
+.PHONY: data-info
+data-info:
+	@echo " Current data configuration:"
+	$(PYTHON_INTERPRETER) -m mlops_rakuten.main info
+
+## Quick check of data versions
+.PHONY: check-versions
+check-versions:
+	@echo " Available data versions:"
+	@for version in data/versions/*/; do \
+		if [ -d "$$version" ]; then \
+			version_name=$$(basename $$version); \
+			if [ -f "$$version/metadata.json" ]; then \
+				samples=$$(grep -o '"n_samples": [0-9]*' "$$version/metadata.json" | grep -o '[0-9]*'); \
+				echo "  ✓ $$version_name: $$samples samples"; \
+			else \
+				echo "  ✗ $$version_name: metadata missing"; \
+			fi \
+		fi \
+	done
 
 #################################################################################
 # PROJECT RULES                                                                 #

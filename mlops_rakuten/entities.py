@@ -1,9 +1,25 @@
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 
 @dataclass
+class DataVersioningConfig:
+    source_x_train_path: Path
+    source_y_train_path: Path
+    
+    version_name: str
+    split_ratio: float
+    description: str
+    apply_drift: Literal[False, "light", "strong"]
+    
+    output_x_path: Path
+    output_y_path: Path
+    output_metadata_path: Path
+
+@dataclass
 class DataIngestionConfig:
+    data_version: str
     x_train_path: Path
     y_train_path: Path
     output_path: Path
@@ -55,6 +71,7 @@ class DataTransformationConfig:
 
 @dataclass
 class ModelTrainerConfig:
+    data_version: str
     model_path: Path
     model_dir: Path
     X_train_path: Path

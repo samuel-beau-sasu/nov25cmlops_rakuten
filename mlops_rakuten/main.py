@@ -7,9 +7,28 @@ from mlops_rakuten.pipelines.data_transformation import DataTransformationPipeli
 from mlops_rakuten.pipelines.model_evaluation import ModelEvaluationPipeline
 from mlops_rakuten.pipelines.model_trainer import ModelTrainerPipeline
 from mlops_rakuten.pipelines.prediction import PredictionPipeline
+from mlops_rakuten.pipelines.data_versioning import DataVersioningPipeline
 
 app = typer.Typer()
 
+@app.command()
+def create_versions():
+    """
+    Crée les versions de données (v1.0, v2.0, v3.0).
+    
+    ⚠️  À exécuter UNE SEULE FOIS au début du projet.
+    
+    Exemple:
+        python -m mlops_rakuten.main create-versions
+    """
+    logger.info("Création des versions de données")
+    
+    pipeline = DataVersioningPipeline()
+    created_versions = pipeline.run()
+    
+    logger.success(f"{len(created_versions)} versions créées avec succès !")
+    for version_dir in created_versions:
+        logger.info(f"{version_dir}")
 
 @app.command()
 def train():
