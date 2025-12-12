@@ -19,7 +19,7 @@ class PredictionPipeline:
         inference_config = config_manager.get_prediction_config()
         self.infer = Prediction(config=inference_config)
 
-    def run(self, texts: List[str], top_k: int):
+    def run(self, texts: List[str], top_k: int | None = None):
         logger.info("Démarrage du pipeline d'inférence")
         preds = self.infer.predict(texts, top_k=top_k)
         logger.success("Inférence terminée")

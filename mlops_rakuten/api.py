@@ -23,13 +23,14 @@ logger.success("PredictionPipeline initialisé")
 
 # Schemas Pydantic
 
+
 class PredictionRequest(BaseModel):
     """
     Requête d'inférence pour un produit Rakuten.
     """
+
     designation: str = Field(
-        min_length=10,
-        description="Designation produit (au moins 10 caractères)."
+        min_length=10, description="Designation produit (au moins 10 caractères)."
     )
     top_k: int | None = 5  # nombre de catégories à retourner (None = toutes)
 
@@ -38,8 +39,7 @@ class PredictionRequest(BaseModel):
     def strip_and_check(cls, v: str) -> str:
         v = v.strip()
         if len(v) < 10:
-            raise ValueError(
-                "La description doit contenir au moins 10 caractères non vides.")
+            raise ValueError("La description doit contenir au moins 10 caractères non vides.")
         return v
 
 
@@ -47,6 +47,7 @@ class CategoryScore(BaseModel):
     """
     Une catégorie prédite avec son code, son nom et sa probabilité.
     """
+
     prdtypecode: int
     category_name: Optional[str]
     proba: float
@@ -56,11 +57,13 @@ class PredictionResponse(BaseModel):
     """
     Réponse d'inférence pour un texte.
     """
+
     designation: str
     predictions: List[CategoryScore]
 
 
 # Endpoints
+
 
 @app.get("/health")
 async def healthcheck():

@@ -90,6 +90,6 @@ class PredictionConfig:
 
     text_column: str
 
-    categories_path: Path
-    category_code_column: str
-    category_name_column: str
+    categories_path: Path | None = None
+    category_code_column: str = "prdtypecode"
+    category_name_column: str = "category_name"

@@ -1,6 +1,5 @@
-from typing import List
-
 import pickle
+
 from loguru import logger
 import numpy as np
 import pandas as pd
@@ -32,8 +31,7 @@ class Prediction:
             self.vectorizer = pickle.load(f)
 
         # Charger label encoder
-        logger.info(
-            f"Chargement du LabelEncoder depuis : {cfg.label_encoder_path}")
+        logger.info(f"Chargement du LabelEncoder depuis : {cfg.label_encoder_path}")
         with open(cfg.label_encoder_path, "rb") as f:
             self.label_encoder = pickle.load(f)
 
@@ -45,19 +43,16 @@ class Prediction:
         # Charger le mapping prdtypecode -> category_name
         self.category_mapping: dict[int, str] | None = None
         if cfg.categories_path is not None:
-            logger.info(
-                f"Chargement des catégories depuis : {cfg.categories_path}")
+            logger.info(f"Chargement des catégories depuis : {cfg.categories_path}")
             df_cat = pd.read_csv(cfg.categories_path)
 
             if cfg.category_code_column not in df_cat.columns:
                 raise KeyError(
-                    f"Colonne code '{cfg.category_code_column}' absente de "
-                    f"{cfg.categories_path}"
+                    f"Colonne code '{cfg.category_code_column}' absente de {cfg.categories_path}"
                 )
             if cfg.category_name_column not in df_cat.columns:
                 raise KeyError(
-                    f"Colonne nom '{cfg.category_name_column}' absente de "
-                    f"{cfg.categories_path}"
+                    f"Colonne nom '{cfg.category_name_column}' absente de {cfg.categories_path}"
                 )
 
             self.category_mapping = dict(
@@ -66,13 +61,11 @@ class Prediction:
                     df_cat[cfg.category_name_column],
                 )
             )
-            logger.info(
-                f"Mapping catégories chargé ({len(self.category_mapping)} entrées)"
-            )
+            logger.info(f"Mapping catégories chargé ({len(self.category_mapping)} entrées)")
 
         logger.success("Initialisation de Prediction terminée")
 
-    def predict(self, texts, top_k: int):
+    def predict(self, texts, top_k: int | None = None):
         """
         Prend une liste de textes (designations produits)
         et renvoie un tableau de prdtypecode (int) prédits.

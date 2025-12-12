@@ -29,14 +29,12 @@ def train():
     # 2. Prétraitement
     preprocessing_pipeline = DataPreprocessingPipeline()
     preprocessing_output_path = preprocessing_pipeline.run()
-    logger.success(
-        f"Dataset prétraité disponible à : {preprocessing_output_path}")
+    logger.success(f"Dataset prétraité disponible à : {preprocessing_output_path}")
 
     # 3. Transformation
     transformation_pipeline = DataTransformationPipeline()
     transformation_output_path = transformation_pipeline.run()
-    logger.success(
-        f"Dataset transformé disponible à : {transformation_output_path}")
+    logger.success(f"Dataset transformé disponible à : {transformation_output_path}")
 
     # 4. Entraînement du modèle
     model_trainer_pipeline = ModelTrainerPipeline()
@@ -46,8 +44,7 @@ def train():
     # 5. Évaluation du modèle sur le jeu de validation
     model_evaluation_pipeline = ModelEvaluationPipeline()
     metrics_path = model_evaluation_pipeline.run()
-    logger.success(
-        f"Métriques de validation disponibles dans : {metrics_path}")
+    logger.success(f"Métriques de validation disponibles dans : {metrics_path}")
 
 
 @app.command()
@@ -68,9 +65,7 @@ def predict(text: str, top_k: int = 5):
     logger.info(f"Texte : {text}")
     for r in results:
         pct = r["proba"] * 100
-        logger.success(
-            f"{r['prdtypecode']} - {r['category_name']} : {pct:.1f}%"
-        )
+        logger.success(f"{r['prdtypecode']} - {r['category_name']} : {pct:.1f}%")
 
 
 if __name__ == "__main__":
