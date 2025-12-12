@@ -153,3 +153,51 @@ Exécuter les tests: `$ make test`
 Vérifier le linting: `$ make lint`
 
 Vérifier le formatting: `$ make format`
+
+---
+
+## Exécution de l'API
+
+### demarrer l'appli dans le répertoire nov25cmlops_rakuten
+uv run uvicorn api.asyn_main:app
+
+### Test CURL
+#### 1. test de la page de bienvenue de l'appli
+curl -X 'GET' \
+  'http://localhost:8000/' \
+  -H 'accept: application/json'
+
+#### 2. Endpoint de santé de l'API
+curl -X 'GET' \
+  'http://localhost:8000/health' \
+  -H 'accept: application/json'
+
+#### 3. Admin Charge les données ET entraîne le modèle en une seule opération.
+curl -X POST "http://localhost:8000/admin/load-and-train" \
+  -u admin:4dm1N \
+  -F "x_train_file=@data/raw/X_train_update.csv" \
+  -F "y_train_file=@data/raw/Y_train_CVw08PX.csv"
+
+#### 4. Affiche le statut des données d'entraînement chargées.
+curl -X 'GET' \
+  'http://localhost:8000/admin/training-job/7fb0c973-f70b-4e1c-8182-4d6099660545' \
+  -u admin:4dm1N \
+  -H 'accept: application/json'
+
+#### 5. Liste tous les jobs de training
+curl -X 'GET' \
+  'http://localhost:8000/admin/training-jobs' \
+  -u admin:4dm1N \
+  -H 'accept: application/json'
+
+#### 6. Effectue des prédictions sur un texte
+curl -X 'POST' \
+  'http://localhost:8000/predict' \
+  -u alice:wonderland \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "texts": [
+    "Porte Flamme Gaxix - Flamebringer Gaxix - 136/220 - U - Twilight Of The Dragons"
+  ]
+}'

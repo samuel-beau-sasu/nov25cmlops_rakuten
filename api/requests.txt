@@ -1,16 +1,5 @@
-# Type de shell utilisé
-echo $SHELL
-
-# Activation de l'environnement virtuel
+# Activation de l'environnement virtuel dans le répertoire : nov25cmlops_rakuten
 source .venv/bin/activate
-
-# 
-export PS1='(\u) \W\$ '
-source ~/.bashrc
-
-#
-PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-source ~/.bashrc
 
 # On ajoute les librairies
 uv add uvicorn[standard]
@@ -21,26 +10,17 @@ uv add typer[standard]
 uv add scipy[standard]
 uv add scikit-learn[standard]
 
-
 uv sync
 
-
-# demarrer l'appli dans le répertoire fastapi_exam_BEAU
-uvicorn main:app
-uv run uvicorn api.main:app
-uv run uvicorn api.new_main:app
+# demarrer l'appli dans le répertoire nov25cmlops_rakuten
 uv run uvicorn api.asyn_main:app
-
-# lien 
-http://localhost:8000/docs
-
- "admin": "4dm1N"
 
 ## GIT 
 git add .
 git commit -m "version 1"
-git push -u origin api
+git push -u origin feature/api
 
+## Test CURL
 # 1. test de la page de bienvenue de l'appli
 curl -X 'GET' \
   'http://localhost:8000/' \
@@ -70,7 +50,6 @@ curl -X 'GET' \
   -H 'accept: application/json'
 
 # 6. Effectue des prédictions sur un texte
-
 curl -X 'POST' \
   'http://localhost:8000/predict' \
   -u alice:wonderland \
