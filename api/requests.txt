@@ -13,7 +13,7 @@ uv add scikit-learn[standard]
 uv sync
 
 # demarrer l'appli dans le répertoire nov25cmlops_rakuten
-uv run uvicorn api.asyn_main:app
+uv run uvicorn api.api_main:app
 
 ## GIT 
 git add .
