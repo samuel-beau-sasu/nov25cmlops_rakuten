@@ -97,7 +97,8 @@ def test_prediction_pipeline_returns_decoded_labels(tmp_path, monkeypatch):
     # Vérifier la structure des dicts
     first = preds_for_text[0]
     assert isinstance(first, dict)
-    assert set(first.keys()) >= {"prdtypecode", "proba"}  # category_name optionnel
+    assert set(first.keys()) >= {"prdtypecode",
+                                 "proba"}  # category_name optionnel
     assert isinstance(first["prdtypecode"], int)
     assert isinstance(first["proba"], float)
 

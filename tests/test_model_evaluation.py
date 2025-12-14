@@ -1,10 +1,9 @@
 import json
-from pathlib import Path
 import pickle
 
 import numpy as np
 from scipy import sparse
-from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
 
 from mlops_rakuten.config.entities import ModelEvaluationConfig
 from mlops_rakuten.modules.model_evaluation import ModelEvaluation
@@ -38,7 +37,7 @@ def test_model_evaluation_computes_and_saves_metrics(tmp_path):
     np.save(y_val_path, y_data)
 
     # Entraîner un modèle simple pour le test
-    model = LinearSVC()
+    model = LogisticRegression(max_iter=1000)
     model.fit(X_val, y_data)
 
     with open(model_path, "wb") as f:

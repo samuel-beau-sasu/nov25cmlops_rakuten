@@ -21,13 +21,12 @@ def test_data_preprocessing_cleans_dataset(tmp_path):
     # - un doublon (même texte + même cible)
     df = pd.DataFrame(
         {
-            "designation": ["prod0", "prod1", "prod2", "prod3", "prod3"],
-            "description": [
-                "valid description one",  # doit rester
+            "designation": [
+                "valid designation one",  # doit rester
                 "short",                  # trop court → supprimé
                 "1234567890",             # alpha_ratio = 0 → supprimé
-                "valid description two",  # doit rester
-                "valid description two",  # doublon → supprimé
+                "valid designation two",  # doit rester
+                "valid designation two",  # doublon → supprimé
             ],
             "prdtypecode": [100, 200, 300, 400, 400],
         }
@@ -39,7 +38,7 @@ def test_data_preprocessing_cleans_dataset(tmp_path):
     cfg = DataPreprocessingConfig(
         input_dataset_path=input_path,
         output_dataset_path=output_path,
-        text_column="description",
+        text_column="designation",
         target_column="prdtypecode",
         drop_na_text=True,
         drop_na_target=True,
@@ -61,7 +60,7 @@ def test_data_preprocessing_cleans_dataset(tmp_path):
     out_df = pd.read_csv(output_path)
 
     # a) On doit avoir conservé les colonnes d'origine
-    assert set(["designation", "description", "prdtypecode"]).issubset(
+    assert set(["designation", "prdtypecode"]).issubset(
         set(out_df.columns)
     )
 
@@ -70,9 +69,9 @@ def test_data_preprocessing_cleans_dataset(tmp_path):
     assert "__alpha_ratio__" not in out_df.columns
 
     # c) Vérifier le filtrage
-    # On s'attend à ne garder que les deux lignes "valid description one" et
-    # une seule "valid description two" (le doublon doit être supprimé)
+    # On s'attend à ne garder que les deux lignes "valid designation one" et
+    # une seule "valid designation two" (le doublon doit être supprimé)
     assert len(out_df) == 2
 
-    descriptions = sorted(out_df["description"].tolist())
-    assert descriptions == ["valid description one", "valid description two"]
+    designations = sorted(out_df["designation"].tolist())
+    assert designations == ["valid designation one", "valid designation two"]

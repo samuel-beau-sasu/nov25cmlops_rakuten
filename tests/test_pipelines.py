@@ -6,16 +6,36 @@ from mlops_rakuten.pipelines.data_transformation import DataTransformationPipeli
 from mlops_rakuten.pipelines.model_trainer import ModelTrainerPipeline
 from mlops_rakuten.pipelines.model_evaluation import ModelEvaluationPipeline
 
-# ---------------------------
-# Dummy Steps
-# ---------------------------
 
+# Dummy Config Manager
+
+class DummyConfigManager:
+    def __init__(self):
+        pass
+
+    def get_data_ingestion_config(self, uploaded_csv_path=None):
+        return object()
+
+    def get_data_preprocessing_config(self):
+        return object()
+
+    def get_data_transformation_config(self):
+        return object()
+
+    def get_model_trainer_config(self):
+        return object()
+
+    def get_model_evaluation_config(self):
+        return object()
+
+
+# Dummy Steps
 
 class DummyDataIngestionStep:
     def __init__(self, config):
         self.config = config
 
-    def run(self) -> Path:
+    def run(self, uploaded_csv_path: Path) -> Path:
         return Path("/fake/path/rakuten_train.csv")
 
 
@@ -51,33 +71,29 @@ class DummyModelEvaluationStep:
         return Path("/fake/path/metrics_val.json")
 
 
-# ---------------------------
 # Tests
-# ---------------------------
 
 def test_data_ingestion_pipeline_calls_step(monkeypatch):
-    """
-    Vérifie que DataIngestionPipeline utilise bien la classe DataIngestion
-    et retourne le chemin prévu.
-    """
+    monkeypatch.setattr(
+        "mlops_rakuten.pipelines.data_ingestion.ConfigurationManager",
+        DummyConfigManager,
+    )
     monkeypatch.setattr(
         "mlops_rakuten.pipelines.data_ingestion.DataIngestion",
         DummyDataIngestionStep,
     )
 
     pipeline = DataIngestionPipeline()
-    output = pipeline.run()
+    output = pipeline.run(uploaded_csv_path=Path("/fake/path/upload.csv"))
 
     assert output == Path("/fake/path/rakuten_train.csv")
 
 
 def test_data_preprocessing_pipeline_calls_step(monkeypatch):
-    """
-    Vérifie que DataPreprocessingPipeline utilise bien la classe DataPreprocessing
-    et retourne le chemin prévu.
-    """
-
-    # Monkeypatch de la classe DataPreprocessing
+    monkeypatch.setattr(
+        "mlops_rakuten.pipelines.data_preprocessing.ConfigurationManager",
+        DummyConfigManager,
+    )
     monkeypatch.setattr(
         "mlops_rakuten.pipelines.data_preprocessing.DataPreprocessing",
         DummyDataPreprocessingStep,
@@ -90,10 +106,10 @@ def test_data_preprocessing_pipeline_calls_step(monkeypatch):
 
 
 def test_data_transformation_pipeline_calls_step(monkeypatch):
-    """
-    Vérifie que DataTransformationPipeline utilise bien la classe DataTransformation
-    et retourne le dossier d'artefacts attendu.
-    """
+    monkeypatch.setattr(
+        "mlops_rakuten.pipelines.data_transformation.ConfigurationManager",
+        DummyConfigManager,
+    )
     monkeypatch.setattr(
         "mlops_rakuten.pipelines.data_transformation.DataTransformation",
         DummyDataTransformationStep,
@@ -106,10 +122,10 @@ def test_data_transformation_pipeline_calls_step(monkeypatch):
 
 
 def test_model_trainer_pipeline_calls_step(monkeypatch):
-    """
-    Vérifie que ModelTrainerPipeline utilise bien la classe ModelTrainer
-    et retourne le chemin du modèle attendu.
-    """
+    monkeypatch.setattr(
+        "mlops_rakuten.pipelines.model_trainer.ConfigurationManager",
+        DummyConfigManager,
+    )
     monkeypatch.setattr(
         "mlops_rakuten.pipelines.model_trainer.ModelTrainer",
         DummyModelTrainerStep,
@@ -122,10 +138,10 @@ def test_model_trainer_pipeline_calls_step(monkeypatch):
 
 
 def test_model_evaluation_pipeline_calls_step(monkeypatch):
-    """
-    Vérifie que ModelEvaluationPipeline utilise bien la classe ModelEvaluation
-    et retourne le chemin attendu pour les métriques.
-    """
+    monkeypatch.setattr(
+        "mlops_rakuten.pipelines.model_evaluation.ConfigurationManager",
+        DummyConfigManager,
+    )
     monkeypatch.setattr(
         "mlops_rakuten.pipelines.model_evaluation.ModelEvaluation",
         DummyModelEvaluationStep,

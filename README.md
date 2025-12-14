@@ -72,7 +72,7 @@ Product type classification for Rakuten France
     │   ├── data_ingestion.py       <- Code to merge new dataset
     │   ├── data_preprocessing.py   <- Code to clean data
     │   ├── data_transformation.py  <- Code for TF-IDF and train / test split
-    │   ├── model_trainer.py        <- Code for Linear SVC
+    │ source .venv/bin/activate  ├── model_trainer.py        <- Code for Linear SVC
     │   ├── model_evaluation.py     <- Code for evaluating Linear SVC performances
     │   └── prediction.py           <- Code for running inference
     │
@@ -101,7 +101,7 @@ Product type classification for Rakuten France
    `$ make create_environment`
 
 3. Activer l'environnement Python (macOS / Linux)
-   `$ source .venv/bin/activate`
+   `$ `
 
 4. Installer les dépendances
    `$ make requirements`

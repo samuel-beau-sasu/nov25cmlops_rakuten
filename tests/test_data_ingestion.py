@@ -1,55 +1,71 @@
-# tests/test_data_ingestion_component.py
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 from mlops_rakuten.config.entities import DataIngestionConfig
 from mlops_rakuten.modules.data_ingestion import DataIngestion
 
 
-def test_data_ingestion_merges_X_and_y(tmp_path):
-    # 1. Préparer des CSV de test
-    raw_dir = tmp_path / "raw"
-    raw_dir.mkdir()
+def test_data_ingestion_appends_uploaded_dataset(tmp_path):
+    """
+    Vérifie que DataIngestion :
+    - charge un CSV uploadé valide
+    - l'append au dataset train existant
+    - sauvegarde le dataset final
+    """
 
-    x_path = raw_dir / "X.csv"
-    y_path = raw_dir / "Y.csv"
-    out_path = tmp_path / "processed" / "dataset.csv"
+    # 1. Dataset train existant
+    interim_dir = tmp_path / "interim"
+    interim_dir.mkdir()
 
-    X = pd.DataFrame(
+    train_path = interim_dir / "rakuten_train.csv"
+
+    df_existing = pd.DataFrame(
         {
-            "designation": ["a", "b"],
-            "description": ["desc a", "desc b"],
-            "productid": [1, 2],
-            "imageid": [10, 20],
-        },
-        index=[0, 1],
+            "designation": ["old product"],
+            "prdtypecode": [10],
+        }
     )
-    y = pd.DataFrame({"prdtypecode": [100, 200]}, index=[0, 1])
+    df_existing.to_csv(train_path, index=False)
 
-    X.to_csv(x_path)
-    y.to_csv(y_path)
+    # 2. CSV uploadé (nouveaux échantillons)
+    upload_path = tmp_path / "uploaded.csv"
 
-    # 2. Config & composant
+    df_uploaded = pd.DataFrame(
+        {
+            "designation": ["new product 1", "new product 2"],
+            "prdtypecode": [20, 30],
+        }
+    )
+    df_uploaded.to_csv(upload_path, index=False)
+
+    # 3. Config & composant
     cfg = DataIngestionConfig(
-        x_train_path=x_path,
-        y_train_path=y_path,
-        output_path=out_path,
+        train_path=train_path,
+        text_column="designation",
+        target_column="prdtypecode",
     )
+
     step = DataIngestion(config=cfg)
 
-    # 3. Run
-    output = step.run()
+    # 4. Run
+    output_path = step.run(uploaded_csv_path=upload_path)
 
-    # 4. Assertions
-    assert output == out_path
-    assert out_path.exists()
+    # 5. Assertions
+    assert output_path == train_path
+    assert train_path.exists()
 
-    df = pd.read_csv(out_path)
-    assert list(df.columns) == [
+    df_final = pd.read_csv(train_path)
+
+    # 1 ancien + 2 nouveaux
+    assert len(df_final) == 3
+
+    assert list(df_final.columns) == [
         "designation",
-        "description",
-        "productid",
-        "imageid",
         "prdtypecode",
     ]
-    assert len(df) == 2
+
+    # Vérifier contenu
+    assert "old product" in df_final["designation"].values
+    assert "new product 1" in df_final["designation"].values
+    assert "new product 2" in df_final["designation"].values
