@@ -73,7 +73,7 @@ class DataSeeding:
         logger.debug(f"Dataset (2 colonnes) shape: {df.shape}")
 
         # 6. Créer les dossiers de sortie
-        create_directories([cfg.seeds_dir])
+        create_directories([cfg.seeds_dir, cfg.output_dataset_path.parent])
 
         # 7. Sauvegarder dataset complet
         full_path = cfg.output_full_path

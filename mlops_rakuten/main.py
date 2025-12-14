@@ -68,18 +68,18 @@ def seed():
 
 
 @app.command()
-def ingest():
+def ingest(uploaded_csv_path: str):
     """
     Point d'entrée CLI pour ingérer et fusionner le nouveau dataset
     au dataset précédemment utilisé.
     Enchaîne :
     - le pipeline d’ingestion des données
-    - le pipeline complet d'entraînement du modèle'
+    - le pipeline complet d'entraînement du modèle
     """
     logger.info("Lancement du pipeline complet (ingestion + entraînement)")
 
     ingestion_pipeline = DataIngestionPipeline()
-    ingestion_output_path = ingestion_pipeline.run()
+    ingestion_output_path = ingestion_pipeline.run(uploaded_csv_path)
     logger.info(f"Dataset fusionné disponible à : {ingestion_output_path}")
 
     _run_training_chain()

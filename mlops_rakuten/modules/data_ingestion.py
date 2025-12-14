@@ -25,14 +25,13 @@ class DataIngestion:
             "Fichier de données mergé": self.config.train_path,
         }
 
-        logger.info(
-            "Vérification de la disponibilité des fichiers de données requis...")
+        logger.info("Vérification de la disponibilité des fichiers de données requis...")
         all_ok = check_required_data_files(required_files)
 
         if not all_ok:
             raise FileNotFoundError(
                 "Les fichiers de données requis sont manquants ou invalides. "
-                "Veuillez suivre les instructions ci-dessus pour les obtenir."
+                "Veuillez suivre les instructions du README pour les obtenir."
             )
         logger.info("Tous les fichiers de données requis sont disponibles.")
 
@@ -46,8 +45,7 @@ class DataIngestion:
         required = [cfg.text_column, cfg.target_column]
         missing = set(required) - set(batch.columns)
         if missing:
-            raise ValueError(
-                f"Colonnes manquantes dans upload: {sorted(missing)}")
+            raise ValueError(f"Colonnes manquantes dans upload: {sorted(missing)}")
         batch = batch[required]
 
         if cfg.train_path.exists():
@@ -56,13 +54,11 @@ class DataIngestion:
             current = current[required]
             merged = pd.concat([current, batch], ignore_index=True)
         else:
-            logger.info(
-                "Aucun dataset courant trouvé, initialisation avec le batch")
+            logger.info("Aucun dataset courant trouvé, initialisation avec le batch")
             merged = batch
 
         # Optionnel: drop_duplicates
-        merged = merged.drop_duplicates(
-            subset=[cfg.text_column, cfg.target_column])
+        merged = merged.drop_duplicates(subset=[cfg.text_column, cfg.target_column])
 
         logger.info(f"Sauvegarde dataset courant : {cfg.train_path}")
         merged.to_csv(cfg.train_path, index=False)

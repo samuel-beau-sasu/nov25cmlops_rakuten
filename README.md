@@ -101,7 +101,7 @@ Product type classification for Rakuten France
    `$ make create_environment`
 
 3. Activer l'environnement Python (macOS / Linux)
-   `$ `
+   `$ source .venv/bin/activate`
 
 4. Installer les dépendances
    `$ make requirements`
@@ -188,6 +188,9 @@ $ ls data/raw/rakuten
 
 Exécuter la Pipeline pour entrainer le modèle initial
    `$ make seed`
+
+Exécuter la Pipeline pour l'ingestion de données
+   `$ make ingest CSV_PATH=data/raw/rakuten/seeds/rakuten_batch_0005.csv"`
 
 Exécuter la Pipeline pour une inférence
    `$ make predict TEXT="Très joli pull pour enfants"`

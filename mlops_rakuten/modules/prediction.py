@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from mlops_rakuten.config.entities import PredictionConfig
+from mlops_rakuten.utils import check_required_data_files
 
 
 class Prediction:
@@ -20,7 +21,25 @@ class Prediction:
 
     def __init__(self, config: PredictionConfig) -> None:
         self.config = config
+        self._check_data_availability()
         self._load_artifacts()
+
+    def _check_data_availability(self) -> None:
+        """Vérifie que les fichiers de données d'entrée sont disponibles."""
+
+        required_files = {
+            "Fichier de correspondance de labels": self.config.categories_path,
+        }
+
+        logger.info("Vérification de la disponibilité du fichier de données requis...")
+        all_ok = check_required_data_files(required_files)
+
+        if not all_ok:
+            raise FileNotFoundError(
+                "Le fichier de correspondance requis est invalide ou indisponible. "
+                "Veuillez suivre les instructions du README pour les obtenir."
+            )
+        logger.info("Le fichier de correspondance requis est disponible.")
 
     def _load_artifacts(self) -> None:
         cfg = self.config

@@ -84,7 +84,7 @@ seed: requirements
 ## Ingest data and train model
 .PHONY: ingest
 ingest: requirements
-	$(PYTHON_INTERPRETER) mlops_rakuten/main.py ingest
+	$(PYTHON_INTERPRETER) mlops_rakuten/main.py ingest $(CSV_PATH)
 
 
 ## Train model
