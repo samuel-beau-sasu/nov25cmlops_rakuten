@@ -5,11 +5,18 @@ from pathlib import Path
 import shutil
 from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, status
+from fastapi.security import OAuth2PasswordRequestForm
 from loguru import logger
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
 
+from mlops_rakuten.auth.auth_simple import (
+    authenticate_user,
+    create_access_token,
+    require_admin,
+    require_user,
+)
 from mlops_rakuten.config.constants import (
     MODELS_DIR,
     REPORTS_DIR,
@@ -21,7 +28,7 @@ from mlops_rakuten.pipelines.data_transformation import DataTransformationPipeli
 from mlops_rakuten.pipelines.model_evaluation import ModelEvaluationPipeline
 from mlops_rakuten.pipelines.model_trainer import ModelTrainerPipeline
 from mlops_rakuten.pipelines.prediction import PredictionPipeline
-from mlops_rakuten.utils import create_directories
+from mlops_rakuten.utils import create_directories, get_latest_run_dir
 
 REQUIRED_COLUMNS = ["designation", "prdtypecode"]
 
@@ -31,21 +38,6 @@ app = FastAPI(
     description="API d'inférence pour la classification de produits Rakuten.",
     version="0.1.0",
 )
-
-
-def get_latest_run_dir(parent_dir: Path) -> Path:
-    """
-    Retourne le sous-répertoire le plus récent via tri lexical.
-    Suppose un naming ISO du type: YYYY-MM-DDTHH-MM-SS (ou similaire).
-    """
-    if not parent_dir.exists():
-        raise FileNotFoundError(f"Répertoire inexistant: {parent_dir}")
-
-    run_dirs = [d for d in parent_dir.iterdir() if d.is_dir()]
-    if not run_dirs:
-        raise FileNotFoundError(f"Aucun run trouvé dans: {parent_dir}")
-
-    return sorted(run_dirs)[-1]
 
 
 def read_json(path: Path) -> Dict[str, Any]:
@@ -144,12 +136,50 @@ class ModelClassificationResponse(BaseModel):
 
 # Endpoints
 @app.get("/health")
-async def healthcheck():
+async def healthcheck(_=Depends(require_user)):
     return {"status": "ok"}
 
 
+@app.post("/predict", response_model=PredictionResponse)
+async def predict(request: PredictionRequest, _=Depends(require_user)):
+    logger.info("Requête /predict reçue")
+
+    results_per_text = prediction_pipeline.run(
+        texts=[request.designation],
+        top_k=request.top_k,
+    )
+
+    preds_raw = results_per_text[0]
+    preds = [
+        CategoryScore(
+            prdtypecode=p["prdtypecode"],
+            category_name=p.get("category_name"),
+            proba=p["proba"],
+        )
+        for p in preds_raw
+    ]
+
+    return PredictionResponse(
+        designation=request.designation,
+        predictions=preds,
+    )
+
+
+@app.post("/token")
+async def token(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Identifiants invalides",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token = create_access_token(username=user["username"], role=user["role"])
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
 @app.get("/model/config", response_model=ModelConfigResponse)
-async def get_model_config():
+async def get_model_config(_=Depends(require_admin)):
     """
     Retourne la config du dernier modèle:
     models/<latest>/model_config.json
@@ -178,7 +208,7 @@ async def get_model_config():
 
 
 @app.get("/model/metrics", response_model=ModelMetricsResponse)
-async def get_model_metrics():
+async def get_model_metrics(_=Depends(require_admin)):
     """
     Retourne les métriques du dernier report:
     reports/<latest>/metrics_val.json
@@ -207,7 +237,7 @@ async def get_model_metrics():
 
 
 @app.get("/model/classification", response_model=ModelClassificationResponse)
-async def get_model_classification_report():
+async def get_model_classification_report(_=Depends(require_admin)):
     """
     Retourne le classification report du dernier report:
     reports/<latest>/classification_report_val.txt
@@ -233,7 +263,7 @@ async def get_model_classification_report():
 
 
 @app.post("/ingest")
-async def ingest_csv(file: UploadFile = File(...)) -> Dict[str, Any]:
+async def ingest_csv(file: UploadFile = File(...), _=Depends(require_admin)) -> Dict[str, Any]:
     """
     Upload d'un batch CSV (simulation admin/user), validation, append au dataset d'entraînement,
     puis exécution de la chaîne preprocessing -> transformation -> training -> evaluation.
@@ -294,28 +324,3 @@ async def ingest_csv(file: UploadFile = File(...)) -> Dict[str, Any]:
     except Exception as e:
         logger.exception("Erreur lors du pipeline ingestion+train")
         raise HTTPException(status_code=500, detail="Erreur pipeline ingestion+train") from e
-
-
-@app.post("/predict", response_model=PredictionResponse)
-async def predict(request: PredictionRequest):
-    logger.info("Requête /predict reçue")
-
-    results_per_text = prediction_pipeline.run(
-        texts=[request.designation],
-        top_k=request.top_k,
-    )
-
-    preds_raw = results_per_text[0]
-    preds = [
-        CategoryScore(
-            prdtypecode=p["prdtypecode"],
-            category_name=p.get("category_name"),
-            proba=p["proba"],
-        )
-        for p in preds_raw
-    ]
-
-    return PredictionResponse(
-        designation=request.designation,
-        predictions=preds,
-    )

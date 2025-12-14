@@ -24,6 +24,7 @@ MODELS_DIR = PROJ_ROOT / "models"
 REPORTS_DIR = PROJ_ROOT / "reports"
 
 MODULE_DIR = PROJ_ROOT / "mlops_rakuten"
+AUTH_DIR = MODULE_DIR / "auth"
 CONFIG_DIR = MODULE_DIR / "config"
 CONFIG_FILE_PATH = CONFIG_DIR / "config.yml"
 

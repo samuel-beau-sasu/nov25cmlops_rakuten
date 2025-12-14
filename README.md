@@ -52,6 +52,11 @@ Product type classification for Rakuten France
     ├── main.py                 <- Scripts to train model or make prediction
     │
     ├── config
+    │   ├── auth_simple.py          <- OAuth2 authentication
+    │   ├── hash_password.py        <- Utility script for getting password hash
+    │   └── users.json              <- Users and Admins lists
+    │
+    ├── config
     │   ├── __init__.py
     │   ├── config_manager.py       <- Create Config objects
     │   ├── config.yml              <- Parameters for Config objects
@@ -168,3 +173,17 @@ Exécuter les tests: `$ make test`
 Vérifier le linting: `$ make lint`
 
 Vérifier le formatting: `$ make format`
+
+---
+
+## Passwords
+
+- `jane` : `password`
+
+- `john` : `password`
+
+- `julien` : `admin123`
+
+- `claudia` : `admin456`
+
+- `samuel` : `admin789`

@@ -12,6 +12,7 @@ pip
 pytest
 python-box
 python-dotenv
+python-jose[cryptography]
 python-multipart
 pyyaml
 ruff
