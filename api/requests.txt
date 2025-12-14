@@ -9,6 +9,9 @@ uv add loguru[standard]
 uv add typer[standard]
 uv add scipy[standard]
 uv add scikit-learn[standard]
+uv add pytest[standard]
+uv add requests[standard]
+requests
 
 uv sync
 
@@ -61,7 +64,8 @@ curl -X 'POST' \
   ]
 }'
 
-
+# tests 
+pytest tests/test_api.py -v
 
 
 
