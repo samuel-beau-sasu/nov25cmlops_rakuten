@@ -12,6 +12,9 @@ logger.info(f"PROJ_ROOT path is: {PROJ_ROOT}")
 
 DATA_DIR = PROJ_ROOT / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
+RAKUTEN_DATA_DIR = RAW_DATA_DIR / "rakuten"
+UPLOADS_DIR = RAW_DATA_DIR / "uploads"
+SEEDS_DATA_DIR = RAKUTEN_DATA_DIR / "seeds"
 INTERIM_DATA_DIR = DATA_DIR / "interim"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
 EXTERNAL_DATA_DIR = DATA_DIR / "external"
@@ -24,9 +27,9 @@ MODULE_DIR = PROJ_ROOT / "mlops_rakuten"
 CONFIG_DIR = MODULE_DIR / "config"
 CONFIG_FILE_PATH = CONFIG_DIR / "config.yml"
 
+logger.info(f"RAW_DATA_DIR is {RAW_DATA_DIR}")
 logger.info(f"MODULE_DIR is {MODULE_DIR}")
-logger.info(f"CONFIG_DIR is {CONFIG_DIR}")
-logger.info(f"CONFIG_FILE_PATH is {CONFIG_FILE_PATH}")
+logger.info(f"MODELS_DIR is {MODELS_DIR}")
 
 # If tqdm is installed, configure loguru with tqdm.write
 # https://github.com/Delgan/loguru/issues/135

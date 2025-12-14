@@ -12,6 +12,7 @@ pip
 pytest
 python-box
 python-dotenv
+python-multipart
 pyyaml
 ruff
 scikit-learn

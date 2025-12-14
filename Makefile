@@ -28,6 +28,7 @@ clean:
 ## Delete processed and interim data
 .PHONY: clean-data
 clean-data:
+	rm -rf data/raw/rakuten/seeds
 	rm -rf data/processed/*
 	rm -rf data/interim/*
 
@@ -72,6 +73,18 @@ create_environment:
 #################################################################################
 # PROJECT RULES                                                                 #
 #################################################################################
+
+
+## Seed data and train model
+.PHONY: seed
+seed: requirements
+	$(PYTHON_INTERPRETER) mlops_rakuten/main.py seed
+
+
+## Ingest data and train model
+.PHONY: ingest
+ingest: requirements
+	$(PYTHON_INTERPRETER) mlops_rakuten/main.py ingest
 
 
 ## Train model

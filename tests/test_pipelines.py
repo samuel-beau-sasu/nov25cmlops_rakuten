@@ -16,7 +16,7 @@ class DummyDataIngestionStep:
         self.config = config
 
     def run(self) -> Path:
-        return Path("/fake/path/ingested_dataset.csv")
+        return Path("/fake/path/rakuten_train.csv")
 
 
 class DummyDataPreprocessingStep:
@@ -68,7 +68,7 @@ def test_data_ingestion_pipeline_calls_step(monkeypatch):
     pipeline = DataIngestionPipeline()
     output = pipeline.run()
 
-    assert output == Path("/fake/path/ingested_dataset.csv")
+    assert output == Path("/fake/path/rakuten_train.csv")
 
 
 def test_data_preprocessing_pipeline_calls_step(monkeypatch):

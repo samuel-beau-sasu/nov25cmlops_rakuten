@@ -3,10 +3,27 @@ from pathlib import Path
 
 
 @dataclass
-class DataIngestionConfig:
+class DataSeedingConfig:
     x_train_path: Path
     y_train_path: Path
-    output_path: Path
+    output_full_path: Path
+    output_remainder_path: Path
+    output_dataset_path: Path
+    seeds_dir: Path
+
+    text_column: str
+    target_column: str
+
+    batch_size: int
+    n_batches: int
+
+
+@dataclass
+class DataIngestionConfig:
+    train_path: Path
+
+    text_column: str
+    target_column: str
 
 
 @dataclass

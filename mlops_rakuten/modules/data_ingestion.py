@@ -9,58 +9,41 @@ from mlops_rakuten.utils import create_directories
 
 class DataIngestion:
     """
-    Étape d'ingestion des données Rakuten.
-
-    - Charge X_train_update.csv (features)
-    - Charge Y_train_CVw08PX.csv (labels)
-    - Vérifie l'alignement des index
-    - Fusionne X et y
-    - Sauvegarde un dataset fusionné dans data/interim/
+    Ingestion incrémentale:
+    - prend un CSV uploadé (designation, prdtypecode)
+    - append dans data/interim/rakuten_train.csv
     """
 
     def __init__(self, config: DataIngestionConfig) -> None:
         self.config = config
 
-    def run(self) -> Path:
-        """
-        Exécute l'ingestion des données et retourne le chemin
-        du fichier dataset fusionné.
-        """
-        logger.info("Démarrage de l'étape DataIngestion")
-
+    def run(self, uploaded_csv_path: Path) -> Path:
         cfg = self.config
+        create_directories([cfg.train_path.parent])
 
-        # 1. Charger X
-        logger.info(f"Lecture de X_train depuis : {cfg.x_train_path}")
-        X = pd.read_csv(cfg.x_train_path, index_col=0)
-        logger.debug(f"X shape: {X.shape}")
+        logger.info(f"Lecture batch uploadé : {uploaded_csv_path}")
+        batch = pd.read_csv(uploaded_csv_path)
 
-        # 2. Charger y
-        logger.info(f"Lecture de Y_train depuis : {cfg.y_train_path}")
-        y = pd.read_csv(cfg.y_train_path, index_col=0)
-        logger.debug(f"y shape: {y.shape}")
+        required = [cfg.text_column, cfg.target_column]
+        missing = set(required) - set(batch.columns)
+        if missing:
+            raise ValueError(f"Colonnes manquantes dans upload: {sorted(missing)}")
+        batch = batch[required]
 
-        # 3. Vérifier l'alignement des index
-        logger.info("Vérification de l'alignement des index entre X et y")
-        if not X.index.equals(y.index):
-            logger.error("Les index de X et y ne correspondent pas")
-            raise ValueError(
-                "Les index de X_train et Y_train ne correspondent pas. "
-                "Impossible de faire un merge sûr."
-            )
+        if cfg.train_path.exists():
+            logger.info(f"Lecture dataset courant : {cfg.train_path}")
+            current = pd.read_csv(cfg.train_path)
+            current = current[required]
+            merged = pd.concat([current, batch], ignore_index=True)
+        else:
+            logger.info("Aucun dataset courant trouvé, initialisation avec le batch")
+            merged = batch
 
-        # 4. Fusionner
-        logger.info("Fusion de X et y")
-        df = X.join(y)  # concaténation horizontale sur l'index
-        logger.debug(f"Dataset fusionné shape: {df.shape}")
+        # Optionnel: drop_duplicates
+        merged = merged.drop_duplicates(subset=[cfg.text_column, cfg.target_column])
 
-        # 5. Créer le dossier de sortie si nécessaire
-        output_path = self.config.output_path
-        create_directories([output_path.parent])
+        logger.info(f"Sauvegarde dataset courant : {cfg.train_path}")
+        merged.to_csv(cfg.train_path, index=False)
 
-        # 6. Sauvegarder
-        logger.info(f"Sauvegarde du dataset fusionné vers : {output_path}")
-        df.to_csv(output_path, index=False)
-
-        logger.success("DataIngestion terminée avec succès")
-        return output_path
+        logger.success("DataIngestion incrémentale terminée")
+        return cfg.train_path

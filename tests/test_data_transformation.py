@@ -12,8 +12,10 @@ from mlops_rakuten.modules.data_transformation import DataTransformation
 
 def test_data_transformation_creates_artifacts(tmp_path):
     # 1. Préparer un CSV d'entrée prétraité
-    interim_dir = tmp_path / "interim"
-    processed_dir = tmp_path / "processed"
+    run_id = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+
+    interim_dir = tmp_path / run_id / "interim"
+    processed_dir = tmp_path / run_id / "processed"
     interim_dir.mkdir()
     processed_dir.mkdir()
 

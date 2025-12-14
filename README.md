@@ -55,13 +55,13 @@ Product type classification for Rakuten France
     │   ├── __init__.py
     │   ├── config_manager.py       <- Create Config objects
     │   ├── config.yml              <- Parameters for Config objects
-    │   ├── constants.py               <- Store useful variables and configuration
+    │   ├── constants.py            <- Store useful variables and configuration
     │   └── entities.py             <- Modules used to process data and train model
     │
     ├── modules
     │   ├── __init__.py
-    │   ├── predict.py              <- Code to run model inference with trained models
-    │   ├── data_ingestion.py       <- Code to merge X and y datasets
+    │   ├── data_seeding.py         <- Code to split initial dataset
+    │   ├── data_ingestion.py       <- Code to merge new dataset
     │   ├── data_preprocessing.py   <- Code to clean data
     │   ├── data_transformation.py  <- Code for TF-IDF and train / test split
     │   ├── model_trainer.py        <- Code for Linear SVC
@@ -69,6 +69,7 @@ Product type classification for Rakuten France
     │   └── prediction.py           <- Code for running inference
     │
     ├── pipelines
+    │   ├── data_seeding.py         <- Data seeding pipeline
     │   ├── data_ingestion.py       <- Data ingestion pipeline
     │   ├── data_preprocessing.py   <- Data Preprocessing pipeline
     │   ├── data_transformation.py  <- Data Transformation pipeline
@@ -106,6 +107,7 @@ Product type classification for Rakuten France
 
 ### Step 2: Configuration Manager
 - mlops_rakuten/config_manager.py crée les objets de configuration en s’appuyant sur les classes définies préalablement.
+  + DataSeedingConfig
   + DataIngestionConfig
   + DataPreprocessingConfig
   + DataTransformationConfig
@@ -114,6 +116,7 @@ Product type classification for Rakuten France
 
 ### Step 3: les modules de Data et Model et Predict
 - mlops_rakuten/modules/ définit les modules utilisés dans les pipelines Data et Model:
+  + mlops_rakuten/modules/data_seeding.py définit le module de DataSeeding (découpage des données initiales)
   + mlops_rakuten/modules/data_ingestion.py définit le module de DataIngestion (fusion des datasets features et target)
   + mlops_rakuten/modules/data_preprocessing.py définit le module de DataPreprocessing (n/a, outliers, duplicates, etc.)
   + mlops_rakuten/modules/data_transformation.py définit le module de DataTransformation (TF-IDF et train / test split, sauvegarde des artifacts)
@@ -122,6 +125,7 @@ Product type classification for Rakuten France
 
 ### Step 4: Étapes du Pipeline
 - mlops_rakuten/pipelines/ définit les pipelines qui seront instanciés et exécutés:
+  + mlops_rakuten/pipelines/data_seeding.py
   + mlops_rakuten/pipelines/data_ingestion.py
   + mlops_rakuten/pipelines/data_preprocessing.py
   + mlops_rakuten/pipelines/data_transformation.py
@@ -135,8 +139,8 @@ Product type classification for Rakuten France
 
 ## Exécution
 
-Exécuter la Pipeline pour entrainer le modèle
-   `$ make train`
+Exécuter la Pipeline pour entrainer le modèle initial
+   `$ make seed`
 
 Exécuter la Pipeline pour une inférence
    `$ make predict TEXT="Très joli pull pour enfants"`
@@ -146,7 +150,7 @@ Exécuter la Pipeline pour une inférence
 ## Application FastAPI
 
 Lancer l'application FastAPI
-   `$ .venv/bin/python -m uvicorn mlops_rakuten.api:app --reload`
+   `$ python -m uvicorn mlops_rakuten.api:app --reload`
 
 Pour accéder à l'API
    [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)

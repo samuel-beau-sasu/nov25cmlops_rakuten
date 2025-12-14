@@ -1,12 +1,32 @@
-data_ingestion:
+data_seeding:
   # Fichiers d'entrée / sortie
   x_train_filename: "X_train_update.csv"
   y_train_filename: "Y_train_CVw08PX.csv"
-  output_dataset_filename: "ingested_dataset.csv"
+  output_full_dataset_filename: "rakuten_dataset_full.csv"
+  output_remainder_dataset_filename: "rakuten_dataset_remainder.csv"
+  output_dataset_filename: "rakuten_train.csv"
+
+  # colonnes
+  text_column: "designation"
+  target_column: "prdtypecode"
+
+  # règles sur les batchs de seed
+  batch_size: 1000
+  n_batches: 10
+
+
+data_ingestion:
+  # Fichier d'entrée / sortie
+  train_filename: "rakuten_train.csv"
+
+  # colonnes
+  text_column: "designation"
+  target_column: "prdtypecode"
+
 
 data_preprocessing:
   # Fichiers d'entrée / sortie
-  input_dataset_filename: "ingested_dataset.csv"
+  input_dataset_filename: "rakuten_train.csv"
   output_dataset_filename: "preprocessed_dataset.csv"
 
   # colonnes
@@ -22,6 +42,7 @@ data_preprocessing:
   min_char_length: 10  # trop court → on supprime
   max_char_length: 200  # trop long → on supprime ou tronque
   min_alpha_ratio: 0.2  # au moins 20% de lettres dans le texte
+
 
 data_transformation:
   # Fichiers d'entrée / sortie
@@ -54,6 +75,7 @@ data_transformation:
   y_train_filename: "y_train.npy"
   y_val_filename: "y_val.npy"
 
+
 model_trainer:
   # Où stocker le modèle entraîné
   model_filename: "text_classifier.pkl"
@@ -70,6 +92,7 @@ model_trainer:
   max_iter: 2000
   use_class_weight: true     # "balanced" si true, ré-équilibrage des classes
 
+
 model_evaluation:
   # Chemin vers le modèle entraîné
   model_filename: "text_classifier.pkl"
@@ -82,6 +105,7 @@ model_evaluation:
   metrics_filename: "metrics_val.json"
   classification_report_filename: "classification_report_val.txt"
   confusion_matrix_filename: "confusion_matrix_val.npy"
+
 
 prediction:
   # Artefacts nécessaires
