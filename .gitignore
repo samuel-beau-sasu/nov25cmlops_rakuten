@@ -1,6 +1,12 @@
 # Data
 /data/
 
+# Logs 
+/logs/
+*.log
+*.log.*
+*.log.zip
+
 # Mac OS-specific storage files
 .DS_Store
 

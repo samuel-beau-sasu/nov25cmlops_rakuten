@@ -7,6 +7,7 @@ from typing import Iterable
 from box import ConfigBox
 from box.exceptions import BoxValueError
 from loguru import logger
+import pandas as pd
 import yaml
 
 
@@ -59,3 +60,61 @@ def create_directories(directories: Iterable[Path], verbose: bool = True) -> Non
         os.makedirs(directory, exist_ok=True)
         if verbose:
             logger.info(f"Répertoire créé ou déjà existant : {directory}")
+
+
+def check_file_exists(file_path: Path, check_readable: bool = True) -> bool:
+    """
+    Vérifie qu'un fichier existe et est lisible.
+
+    Args:
+        file_path: Chemin vers le fichier
+        check_readable: Si True, tente de lire les premières lignes
+
+    Returns:
+        True si le fichier est OK, False sinon
+    """
+    if not file_path.exists():
+        return False
+
+    if check_readable:
+        try:
+            df = pd.read_csv(file_path, nrows=5)
+            size_mb = file_path.stat().st_size / (1024 * 1024)
+            logger.debug(f"{file_path.name} ({size_mb:.1f} MB, {df.shape[1]} colonnes)")
+            return True
+        except Exception as e:
+            logger.warning(f"{file_path.name} : {e}")
+            return False
+
+    return True
+
+
+def check_required_data_files(
+    required_files: dict[str, Path],
+    show_instructions: bool = True,
+) -> bool:
+    """
+    Vérifie la présence de fichiers de données requis.
+
+    Args:
+        required_files: Dict {description: path}
+        show_instructions: Si True, affiche instructions si fichiers manquants
+
+    Returns:
+        True si tous les fichiers sont OK, False sinon
+    """
+    missing_files = [
+        file_path.name for file_path in required_files.values() if not check_file_exists(file_path)
+    ]
+
+    if missing_files:
+        logger.error("Fichiers manquants dans data/raw/ :")
+        for filename in missing_files:
+            logger.error(f"{filename}")
+
+        if show_instructions:
+            logger.info("\n Consultez le README (section 'Configuration des données')")
+
+        return False
+
+    return True

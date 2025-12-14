@@ -4,7 +4,7 @@ from loguru import logger
 import pandas as pd
 
 from mlops_rakuten.entities import DataIngestionConfig
-from mlops_rakuten.utils import create_directories
+from mlops_rakuten.utils import check_required_data_files, create_directories
 
 
 class DataIngestion:
@@ -20,6 +20,25 @@ class DataIngestion:
 
     def __init__(self, config: DataIngestionConfig) -> None:
         self.config = config
+        self._check_data_availability()
+
+    def _check_data_availability(self) -> None:
+        """Vérifie que les fichiers de données d'entrée sont disponibles."""
+
+        required_files = {
+            "Fichier des features (X_train)": self.config.x_train_path,
+            "Fichier des labels (Y_train)": self.config.y_train_path,
+        }
+
+        logger.info("Vérification de la disponibilité des fichiers de données requis...")
+        all_ok = check_required_data_files(required_files)
+
+        if not all_ok:
+            raise FileNotFoundError(
+                "Les fichiers de données requis sont manquants ou invalides. "
+                "Veuillez suivre les instructions ci-dessus pour les obtenir."
+            )
+        logger.info("Tous les fichiers de données requis sont disponibles.")
 
     def run(self) -> Path:
         """
