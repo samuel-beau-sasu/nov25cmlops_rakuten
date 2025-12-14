@@ -69,9 +69,6 @@ class DataTransformationConfig:
     y_train_path: Path
     y_val_path: Path
 
-    text_column: str
-    target_column: str
-
 
 @dataclass
 class ModelTrainerConfig:

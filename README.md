@@ -17,11 +17,14 @@ Product type classification for Rakuten France
 │
 ├── docs               <- A default mkdocs project; see www.mkdocs.org for details
 │
+├── logs               <- Contains all log and error files
+│
 ├── models             <- Trained and serialized models, model predictions, or model summaries
 │
-├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-│                         the creator's initials, and a short `-` delimited description, e.g.
-│                         `1.0-jqp-initial-data-exploration`.
+├── notebooks          
+│   └── 01_exploration.ipynb  <- Text data exploration
+│                         
+│                         
 │
 ├── pyproject.toml     <- Project configuration file with package metadata for
 │                         mlops_rakuten and configuration for tools like black
@@ -89,17 +92,56 @@ Product type classification for Rakuten France
 
 ## Installation
 
+### 1. Environnement Python
+
 1. Vérifier si `uv` est installé, sinon [Installer uv](https://docs.astral.sh/uv/getting-started/installation/).
    `$ uv --version`
 
-2. Activer l'environnement Python (macOS / Linux)
+2. Création de l'environnement Python (macOs / Linux)
+   `$ make create_environment`
+
+3. Activer l'environnement Python (macOS / Linux)
    `$ source .venv/bin/activate`
 
-3. Installer les dépendances
+4. Installer les dépendances
    `$ make requirements`
 
-4. Vérifier que l'environnement est opérationnel
+5. Vérifier que l'environnement est opérationnel
    `$ python -c "import pandas, typer, mlops_rakuten; print('OK')"`
+
+### 2. Configuration des données
+
+Les données ne sont pas incluses dans le repository. Vous devez les télécharger manuellement.
+
+#### Étape 1 : Télécharger les données
+
+- Accéder au dossier partagé
+- Télécharger les fichiers :
+  - `X_train_update.csv`
+  - `Y_train_CVw08PX.csv`
+  - `product_categories.csv`
+
+#### Étape 2 : Créer le dossier et copier les fichiers
+```bash
+# Créer le dossier data/raw/rakuten s'il n'existe pas
+$ mkdir -p data/raw/rakuten
+```
+
+#### Étape 2 : Copier-Coller les fichiers dans les repertoires
+- `product_categories.csv` dans `data/raw/`
+- `X_train_update.csv` et `Y_train_CVw08PX.csv` dans `data/raw/rakuten`
+
+#### Étape 4 : Vérifier
+```bash
+# Vérifier la présence des fichiers
+$ ls data/raw/
+$ ls data/raw/rakuten
+
+# Devrait afficher :
+# product_categories.csv
+# X_train_update.csv
+# Y_train_CVw08PX.csv
+```
 
 ---
 
@@ -166,9 +208,9 @@ Pour accéder à l'API
 
 Toutes les fonctions documentées
 
-Nettoyer les répertoires: `$ make clean-all`
-
 Exécuter les tests: `$ make test`
+
+Nettoyer les répertoires: `$ make clean-all`
 
 Vérifier le linting: `$ make lint`
 
