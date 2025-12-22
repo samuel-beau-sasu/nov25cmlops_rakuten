@@ -4,9 +4,9 @@ import pickle
 import numpy as np
 import pytest
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import LinearSVC
-from sklearn.linear_model import LogisticRegression
 
 from mlops_rakuten.config.entities import PredictionConfig
 from mlops_rakuten.pipelines.prediction import PredictionPipeline
@@ -78,6 +78,11 @@ def test_prediction_pipeline_returns_decoded_labels(tmp_path, monkeypatch):
     )
 
     # 4. Instancier le pipeline de prédiction
+    monkeypatch.setattr(
+        "mlops_rakuten.modules.prediction.Prediction._check_data_availability",
+        lambda self: None,
+    )
+
     pipeline = PredictionPipeline()
 
     # 5. Prédire sur un texte proche de la classe "10"

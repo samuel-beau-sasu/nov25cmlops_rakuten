@@ -15,8 +15,6 @@ PYTHON_INTERPRETER = python
 .PHONY: requirements
 requirements:
 	uv pip install -r requirements.txt
-	
-
 
 
 ## Delete all compiled Python files
@@ -25,12 +23,14 @@ clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
 
+
 ## Delete processed and interim data
 .PHONY: clean-data
 clean-data:
 	rm -rf data/raw/rakuten/seeds
 	rm -rf data/processed/*
 	rm -rf data/interim/*
+
 
 ## Delete all generated artifacts (be careful)
 .PHONY: clean-all
@@ -45,12 +45,12 @@ lint:
 	ruff format --check
 	ruff check
 
+
 ## Format source code with ruff
 .PHONY: format
 format:
 	ruff check --fix
 	ruff format
-
 
 
 ## Run tests
@@ -66,8 +66,6 @@ create_environment:
 	@echo ">>> New uv virtual environment created. Activate with:"
 	@echo ">>> Windows: .\\\\.venv\\\\Scripts\\\\activate"
 	@echo ">>> Unix/macOS: source ./.venv/bin/activate"
-	
-
 
 
 #################################################################################

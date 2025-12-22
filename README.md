@@ -23,8 +23,7 @@ Product type classification for Rakuten France
 │
 ├── notebooks          
 │   └── 01_exploration.ipynb  <- Text data exploration
-│                         
-│                         
+│
 │
 ├── pyproject.toml     <- Project configuration file with package metadata for
 │                         mlops_rakuten and configuration for tools like black
@@ -127,7 +126,7 @@ Les données ne sont pas incluses dans le repository. Vous devez les télécharg
 $ mkdir -p data/raw/rakuten
 ```
 
-#### Étape 2 : Copier-Coller les fichiers dans les repertoires
+#### Étape 3 : Copier-Coller les fichiers dans les repertoires
 - `product_categories.csv` dans `data/raw/`
 - `X_train_update.csv` et `Y_train_CVw08PX.csv` dans `data/raw/rakuten`
 
@@ -188,6 +187,8 @@ $ ls data/raw/rakuten
 
 Exécuter la Pipeline pour entrainer le modèle initial
    `$ make seed`
+
+   `$ make train`
 
 Exécuter la Pipeline pour l'ingestion de données
    `$ make ingest CSV_PATH=data/raw/rakuten/seeds/rakuten_batch_0005.csv"`

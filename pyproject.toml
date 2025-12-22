@@ -41,3 +41,7 @@ extend-select = ["I"]  # Add import sorting
 known-first-party = ["mlops_rakuten"]
 force-sort-within-sections = true
 
+[tool.pytest.ini_options]
+filterwarnings = [
+  "ignore:.*'crypt' is deprecated.*:DeprecationWarning",
+]
