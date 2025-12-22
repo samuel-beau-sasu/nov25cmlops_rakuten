@@ -4,10 +4,11 @@ import pickle
 import numpy as np
 import pytest
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import LinearSVC
 
-from mlops_rakuten.entities import PredictionConfig
+from mlops_rakuten.config.entities import PredictionConfig
 from mlops_rakuten.pipelines.prediction import PredictionPipeline
 
 
@@ -41,7 +42,8 @@ def test_prediction_pipeline_returns_decoded_labels(tmp_path, monkeypatch):
     y = le.fit_transform(prdtypecodes)
 
     # Modèle linéaire simple
-    model = LinearSVC()
+    # model = LinearSVC()
+    model = LogisticRegression(max_iter=1000, solver="lbfgs")
     model.fit(X, y)
 
     # Sauvegarder les artefacts comme dans le vrai pipeline
@@ -76,6 +78,11 @@ def test_prediction_pipeline_returns_decoded_labels(tmp_path, monkeypatch):
     )
 
     # 4. Instancier le pipeline de prédiction
+    monkeypatch.setattr(
+        "mlops_rakuten.modules.prediction.Prediction._check_data_availability",
+        lambda self: None,
+    )
+
     pipeline = PredictionPipeline()
 
     # 5. Prédire sur un texte proche de la classe "10"
@@ -84,12 +91,26 @@ def test_prediction_pipeline_returns_decoded_labels(tmp_path, monkeypatch):
 
     print(preds)
 
-    # On doit récupérer un prdtypecode d'origine (10 ou 20)
+    # preds = pipeline.run([test_text], top_k=2)  # ex
     assert isinstance(preds, list)
     assert len(preds) == 1
-    assert preds[0] in set(prdtypecodes)
 
-    # Sanity check : pour un texte "dress", on s'attend plutôt à la classe 10
-    # (pas strictement garanti, mais très probable)
-    # Donc on peut l'exprimer de manière souple :
-    # assert preds[0] == 10
+    preds_for_text = preds[0]
+    assert isinstance(preds_for_text, list)
+    assert len(preds_for_text) >= 1
+
+    # Vérifier la structure des dicts
+    first = preds_for_text[0]
+    assert isinstance(first, dict)
+    assert set(first.keys()) >= {"prdtypecode",
+                                 "proba"}  # category_name optionnel
+    assert isinstance(first["prdtypecode"], int)
+    assert isinstance(first["proba"], float)
+
+    # Vérifier que les codes prédits sont bien dans l’univers des labels
+    codes = [p["prdtypecode"] for p in preds_for_text]
+    assert all(c in set(prdtypecodes) for c in codes)
+
+    # Vérifier tri décroissant des probas
+    probas = [p["proba"] for p in preds_for_text]
+    assert probas == sorted(probas, reverse=True)

@@ -23,8 +23,7 @@ Product type classification for Rakuten France
 │
 ├── notebooks          
 │   └── 01_exploration.ipynb  <- Text data exploration
-│                         
-│                         
+│
 │
 ├── pyproject.toml     <- Project configuration file with package metadata for
 │                         mlops_rakuten and configuration for tools like black
@@ -50,27 +49,34 @@ Product type classification for Rakuten France
     │
     ├── __init__.py             <- Makes mlops_rakuten a Python module
     │
-    ├── config_manager.py       <- Create Config objects
-    │
-    ├── config.py               <- Store useful variables and configuration
-    │
-    ├── config.yml              <- Parameters for Config objects
+    ├── app.py                  <- FastAPI endpoints
     │
     ├── main.py                 <- Scripts to train model or make prediction
     │
-    ├── entities.py             <- Modules used to process data and train model
+    ├── config
+    │   ├── auth_simple.py          <- OAuth2 authentication
+    │   ├── hash_password.py        <- Utility script for getting password hash
+    │   └── users.json              <- Users and Admins lists
+    │
+    ├── config
+    │   ├── __init__.py
+    │   ├── config_manager.py       <- Create Config objects
+    │   ├── config.yml              <- Parameters for Config objects
+    │   ├── constants.py            <- Store useful variables and configuration
+    │   └── entities.py             <- Modules used to process data and train model
     │
     ├── modules
     │   ├── __init__.py
-    │   ├── predict.py              <- Code to run model inference with trained models
-    │   ├── data_ingestion.py       <- Code to merge X and y datasets
+    │   ├── data_seeding.py         <- Code to split initial dataset
+    │   ├── data_ingestion.py       <- Code to merge new dataset
     │   ├── data_preprocessing.py   <- Code to clean data
     │   ├── data_transformation.py  <- Code for TF-IDF and train / test split
-    │   ├── model_trainer.py        <- Code for Linear SVC
+    │ source .venv/bin/activate  ├── model_trainer.py        <- Code for Linear SVC
     │   ├── model_evaluation.py     <- Code for evaluating Linear SVC performances
     │   └── prediction.py           <- Code for running inference
     │
     ├── pipelines
+    │   ├── data_seeding.py         <- Data seeding pipeline
     │   ├── data_ingestion.py       <- Data ingestion pipeline
     │   ├── data_preprocessing.py   <- Data Preprocessing pipeline
     │   ├── data_transformation.py  <- Data Transformation pipeline
@@ -108,25 +114,30 @@ Les données ne sont pas incluses dans le repository. Vous devez les télécharg
 
 #### Étape 1 : Télécharger les données
 
-- Accéder au dossier partagé 
+- Accéder au dossier partagé
 - Télécharger les fichiers :
   - `X_train_update.csv`
   - `Y_train_CVw08PX.csv`
+  - `product_categories.csv`
 
 #### Étape 2 : Créer le dossier et copier les fichiers
 ```bash
-# Créer le dossier data/raw s'il n'existe pas
-$ mkdir -p data/raw
+# Créer le dossier data/raw/rakuten s'il n'existe pas
+$ mkdir -p data/raw/rakuten
 ```
-- Copier-Coller les fichiers dans le repertoire crée précedemment
 
+#### Étape 3 : Copier-Coller les fichiers dans les repertoires
+- `product_categories.csv` dans `data/raw/`
+- `X_train_update.csv` et `Y_train_CVw08PX.csv` dans `data/raw/rakuten`
 
-#### Étape 3 : Vérifier
+#### Étape 4 : Vérifier
 ```bash
 # Vérifier la présence des fichiers
-$ ls data/raw/  
+$ ls data/raw/
+$ ls data/raw/rakuten
 
 # Devrait afficher :
+# product_categories.csv
 # X_train_update.csv
 # Y_train_CVw08PX.csv
 ```
@@ -142,6 +153,7 @@ $ ls data/raw/
 
 ### Step 2: Configuration Manager
 - mlops_rakuten/config_manager.py crée les objets de configuration en s’appuyant sur les classes définies préalablement.
+  + DataSeedingConfig
   + DataIngestionConfig
   + DataPreprocessingConfig
   + DataTransformationConfig
@@ -150,6 +162,7 @@ $ ls data/raw/
 
 ### Step 3: les modules de Data et Model et Predict
 - mlops_rakuten/modules/ définit les modules utilisés dans les pipelines Data et Model:
+  + mlops_rakuten/modules/data_seeding.py définit le module de DataSeeding (découpage des données initiales)
   + mlops_rakuten/modules/data_ingestion.py définit le module de DataIngestion (fusion des datasets features et target)
   + mlops_rakuten/modules/data_preprocessing.py définit le module de DataPreprocessing (n/a, outliers, duplicates, etc.)
   + mlops_rakuten/modules/data_transformation.py définit le module de DataTransformation (TF-IDF et train / test split, sauvegarde des artifacts)
@@ -158,6 +171,7 @@ $ ls data/raw/
 
 ### Step 4: Étapes du Pipeline
 - mlops_rakuten/pipelines/ définit les pipelines qui seront instanciés et exécutés:
+  + mlops_rakuten/pipelines/data_seeding.py
   + mlops_rakuten/pipelines/data_ingestion.py
   + mlops_rakuten/pipelines/data_preprocessing.py
   + mlops_rakuten/pipelines/data_transformation.py
@@ -171,11 +185,26 @@ $ ls data/raw/
 
 ## Exécution
 
-Exécuter la Pipeline pour entrainer le modèle
+Exécuter la Pipeline pour entrainer le modèle initial
+   `$ make seed`
+
    `$ make train`
+
+Exécuter la Pipeline pour l'ingestion de données
+   `$ make ingest CSV_PATH=data/raw/rakuten/seeds/rakuten_batch_0005.csv"`
 
 Exécuter la Pipeline pour une inférence
    `$ make predict TEXT="Très joli pull pour enfants"`
+
+---
+
+## Application FastAPI
+
+Lancer l'application FastAPI
+   `$ python -m uvicorn mlops_rakuten.api:app --reload`
+
+Pour accéder à l'API
+   [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ---
 
@@ -190,3 +219,17 @@ Nettoyer les répertoires: `$ make clean-all`
 Vérifier le linting: `$ make lint`
 
 Vérifier le formatting: `$ make format`
+
+---
+
+## Passwords
+
+- `jane` : `password`
+
+- `john` : `password`
+
+- `julien` : `admin123`
+
+- `claudia` : `admin456`
+
+- `samuel` : `admin789`

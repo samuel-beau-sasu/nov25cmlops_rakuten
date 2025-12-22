@@ -18,8 +18,14 @@ classifiers = [
 requires-python = "~=3.12.0"
 dependencies = [
     "dotenv>=0.9.9",
+    "fastapi>=0.124.2",
+    "jose>=1.0.0",
+    "passlib>=1.7.4",
     "python-box>=7.3.2",
+    "python-jose[cryptography]>=3.5.0",
+    "python-multipart>=0.0.20",
     "pyyaml>=6.0.3",
+    "uvicorn>=0.38.0",
 ]
 
 
@@ -35,3 +41,7 @@ extend-select = ["I"]  # Add import sorting
 known-first-party = ["mlops_rakuten"]
 force-sort-within-sections = true
 
+[tool.pytest.ini_options]
+filterwarnings = [
+  "ignore:.*'crypt' is deprecated.*:DeprecationWarning",
+]

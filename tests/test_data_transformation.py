@@ -1,36 +1,36 @@
-from pathlib import Path
+from datetime import datetime
 import json
+from pathlib import Path
 import pickle
 
 import numpy as np
 import pandas as pd
 from scipy import sparse
 
-from mlops_rakuten.entities import DataTransformationConfig
+from mlops_rakuten.config.entities import DataTransformationConfig
 from mlops_rakuten.modules.data_transformation import DataTransformation
 
 
 def test_data_transformation_creates_artifacts(tmp_path):
     # 1. Préparer un CSV d'entrée prétraité
-    interim_dir = tmp_path / "interim"
-    processed_dir = tmp_path / "processed"
-    interim_dir.mkdir()
-    processed_dir.mkdir()
+    run_id = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+
+    interim_dir = tmp_path / "interim" / run_id
+    processed_dir = tmp_path / "processed" / run_id
+    interim_dir.mkdir(parents=True)
+    processed_dir.mkdir(parents=True)
 
     input_path = interim_dir / "preprocessed_dataset.csv"
 
-    # Dataset simple avec :
-    # - 10 lignes
-    # - 2 classes (100 et 200) pour permettre un split stratifié
     df = pd.DataFrame(
         {
-            "description": [
+            "designation": [
                 "this is product one",
                 "this is product two",
                 "another product one",
                 "another product two",
-                "extra description for product one",
-                "extra description for product two",
+                "extra designation for product one",
+                "extra designation for product two",
                 "yet another item one",
                 "yet another item two",
                 "different text for class one",
@@ -68,7 +68,7 @@ def test_data_transformation_creates_artifacts(tmp_path):
         X_val_path=X_val_path,
         y_train_path=y_train_path,
         y_val_path=y_val_path,
-        text_column="description",
+        text_column="designation",
         target_column="prdtypecode",
     )
 
@@ -77,11 +77,11 @@ def test_data_transformation_creates_artifacts(tmp_path):
     # 3. Run
     output_dir = step.run()
 
-    # 4. Assertions de base sur la sortie
+    # 4. Assertions
     assert output_dir == processed_dir
     assert processed_dir.exists()
 
-    # 5. Vérifier que tous les artefacts ont été créés
+    # 5. Artefacts
     assert vectorizer_path.exists()
     assert label_encoder_path.exists()
     assert class_mapping_path.exists()
@@ -90,40 +90,30 @@ def test_data_transformation_creates_artifacts(tmp_path):
     assert y_train_path.exists()
     assert y_val_path.exists()
 
-    # 6. Vérifier les shapes et la cohérence des splits
+    # 6. Shapes
     X_train = sparse.load_npz(X_train_path)
     X_val = sparse.load_npz(X_val_path)
     y_train = np.load(y_train_path)
     y_val = np.load(y_val_path)
 
-    # On avait 10 lignes au total, avec test_size=0.2 -> 8 train, 2 val
     assert X_train.shape[0] == 8
     assert X_val.shape[0] == 2
     assert y_train.shape[0] == 8
     assert y_val.shape[0] == 2
 
-    # Vérifier que les labels encodés sont bien 0/1
     assert set(np.unique(y_train)).issubset({0, 1})
     assert set(np.unique(y_val)).issubset({0, 1})
 
-    # 7. Vérifier le label encoder et le mapping
+    # 7. Encoder + mapping
     with open(label_encoder_path, "rb") as f:
         le = pickle.load(f)
-
-    # Le LabelEncoder doit avoir vu les classes 100 et 200
     assert set(le.classes_) == {100, 200}
 
     with open(class_mapping_path, "r") as f:
         class_mapping = json.load(f)
+    assert set(class_mapping.values()) == {100, 200}
 
-    # Les clés JSON sont des strings, on les convertit en int
-    # On doit avoir un mapping 0->100 et 1->200 (ou l'inverse, selon l'ordre)
-    mapped_values = set(class_mapping.values())
-    assert mapped_values == {100, 200}
-
-    # 8. Vérifier que le vectorizer est utilisable
+    # 8. Vectorizer
     with open(vectorizer_path, "rb") as f:
         vectorizer = pickle.load(f)
-
-    # Le vocabulaire ne doit pas être vide
     assert len(vectorizer.vocabulary_) > 0

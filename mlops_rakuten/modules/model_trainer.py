@@ -5,10 +5,11 @@ import pickle
 from loguru import logger
 import numpy as np
 from scipy import sparse
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, f1_score
 from sklearn.svm import LinearSVC
 
-from mlops_rakuten.entities import ModelTrainerConfig
+from mlops_rakuten.config.entities import ModelTrainerConfig
 from mlops_rakuten.utils import create_directories
 
 
@@ -48,9 +49,23 @@ class ModelTrainer:
                 class_weight=class_weight,
             )
 
+        if cfg.model_type == "logistic_regression":
+            class_weight = "balanced" if cfg.use_class_weight else None
+            logger.info(
+                "Instanciation d'une LogisticRegression "
+                f"(C={cfg.C}, max_iter={cfg.max_iter}, "
+                f"class_weight={class_weight}, multi_class='multinomial')"
+            )
+            return LogisticRegression(
+                C=cfg.C,
+                max_iter=cfg.max_iter,
+                class_weight=class_weight,
+                n_jobs=-1,
+            )
+
         raise ValueError(
             f"Type de modèle non supporté : '{cfg.model_type}'. "
-            "Actuellement seul 'linear_svc' est géré."
+            "Actuellement 'linear_svc' et 'logistic_regression' sont gérés."
         )
 
     def run(self) -> Path:

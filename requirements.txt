@@ -1,4 +1,5 @@
 dotenv
+fastapi
 ipython
 jupyterlab
 loguru
@@ -11,9 +12,12 @@ pip
 pytest
 python-box
 python-dotenv
+python-jose[cryptography]
+python-multipart
 pyyaml
 ruff
 scikit-learn
 tqdm
 typer
+uvicorn
 -e .

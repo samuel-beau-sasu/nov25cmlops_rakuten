@@ -1,0 +1,7 @@
+[
+  {"username": "john", "first_name": "John", "last_name": "Doe", "password_hash": "$pbkdf2-sha256$29000$AcC4tzbG.N/b2zvHmHMOgQ$RNlfF.sj1IPCtzQe5q7uP.41l0bxuMSleawozbfqojc", "role": "user", "is_active": false},
+  {"username": "jane", "first_name": "Jane", "last_name": "Doe", "password_hash": "$pbkdf2-sha256$29000$AcC4tzbG.N/b2zvHmHMOgQ$RNlfF.sj1IPCtzQe5q7uP.41l0bxuMSleawozbfqojc", "role": "user", "is_active": true},
+  {"username": "julien", "first_name": "Julien", "last_name": "Mad", "password_hash": "$pbkdf2-sha256$29000$N0ZICYEQonSutdb6n3Pu/Q$fwFLuhIicf9ndBRmnBRc30gqgfpQHEh5f5qjc35tAWg", "role": "admin", "is_active": true},
+  {"username": "claudia", "first_name": "Claudia", "last_name": "Rossi", "password_hash": "$pbkdf2-sha256$29000$IOS8N8b4H2MMAWDsnfN.rw$ukpRcFgG6KThQksE8xo7ixQOf6/lobrY5daWE6xhr4Y", "role": "admin", "is_active": true},
+  {"username": "samuel", "first_name": "Samuel", "last_name": "De Gaulle", "password_hash": "$pbkdf2-sha256$29000$gbB2LsUYA4AwBkDI2XuPUQ$T9xj0XQvFjrogvlNuRqqTxmZIwckP/ynWpF84mMntkE", "role": "admin", "is_active": true}
+]

@@ -118,3 +118,24 @@ def check_required_data_files(
         return False
 
     return True
+
+
+def get_latest_run_dir(parent_dir: Path) -> Path:
+    """
+    Retourne le sous-répertoire le plus récent (tri lexical par nom),
+    en supposant un nom de type ISO-8601: YYYY-MM-DDTHH-MM-SS
+    """
+    if not parent_dir.exists():
+        logger.error(f"Répertoire inexistant : {parent_dir}")
+        raise FileNotFoundError(f"{parent_dir} n'existe pas")
+
+    run_dirs = [d for d in parent_dir.iterdir() if d.is_dir()]
+
+    if not run_dirs:
+        logger.error(f"Aucun run trouvé dans : {parent_dir}")
+        raise FileNotFoundError(f"Aucun sous-répertoire dans {parent_dir}")
+
+    latest_dir = sorted(run_dirs)[-1]
+    logger.info(f"Dernier run détecté : {latest_dir.name}")
+
+    return latest_dir

@@ -2,7 +2,7 @@ from typing import List
 
 from loguru import logger
 
-from mlops_rakuten.config_manager import ConfigurationManager
+from mlops_rakuten.config.config_manager import ConfigurationManager
 from mlops_rakuten.modules.prediction import Prediction
 
 
@@ -19,8 +19,8 @@ class PredictionPipeline:
         inference_config = config_manager.get_prediction_config()
         self.infer = Prediction(config=inference_config)
 
-    def run(self, texts: List[str]):
+    def run(self, texts: List[str], top_k: int | None = None):
         logger.info("Démarrage du pipeline d'inférence")
-        preds = self.infer.predict(texts)
+        preds = self.infer.predict(texts, top_k=top_k)
         logger.success("Inférence terminée")
         return preds

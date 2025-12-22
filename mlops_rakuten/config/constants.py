@@ -7,11 +7,14 @@ from loguru import logger
 load_dotenv()
 
 # Paths
-PROJ_ROOT = Path(__file__).resolve().parents[1]
+PROJ_ROOT = Path(__file__).resolve().parents[2]
 logger.info(f"PROJ_ROOT path is: {PROJ_ROOT}")
 
 DATA_DIR = PROJ_ROOT / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
+RAKUTEN_DATA_DIR = RAW_DATA_DIR / "rakuten"
+UPLOADS_DIR = RAW_DATA_DIR / "uploads"
+SEEDS_DATA_DIR = RAKUTEN_DATA_DIR / "seeds"
 INTERIM_DATA_DIR = DATA_DIR / "interim"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
 EXTERNAL_DATA_DIR = DATA_DIR / "external"
@@ -21,7 +24,13 @@ MODELS_DIR = PROJ_ROOT / "models"
 REPORTS_DIR = PROJ_ROOT / "reports"
 
 MODULE_DIR = PROJ_ROOT / "mlops_rakuten"
-CONFIG_FILE_PATH = MODULE_DIR / "config.yml"
+AUTH_DIR = MODULE_DIR / "auth"
+CONFIG_DIR = MODULE_DIR / "config"
+CONFIG_FILE_PATH = CONFIG_DIR / "config.yml"
+
+logger.info(f"RAW_DATA_DIR is {RAW_DATA_DIR}")
+logger.info(f"MODULE_DIR is {MODULE_DIR}")
+logger.info(f"MODELS_DIR is {MODELS_DIR}")
 
 
 # fichier de logs

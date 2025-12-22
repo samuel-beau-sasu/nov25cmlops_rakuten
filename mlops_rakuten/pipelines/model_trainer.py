@@ -2,7 +2,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from mlops_rakuten.config_manager import ConfigurationManager
+from mlops_rakuten.config.config_manager import ConfigurationManager
 from mlops_rakuten.modules.model_trainer import ModelTrainer
 
 

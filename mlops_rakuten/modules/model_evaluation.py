@@ -12,7 +12,7 @@ from sklearn.metrics import (
     f1_score,
 )
 
-from mlops_rakuten.entities import ModelEvaluationConfig
+from mlops_rakuten.config.entities import ModelEvaluationConfig
 from mlops_rakuten.utils import create_directories
 
 

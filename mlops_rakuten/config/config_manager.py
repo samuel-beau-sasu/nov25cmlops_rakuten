@@ -1,25 +1,30 @@
 # mlops_rakuten/config_manager.py
+from datetime import datetime
 from pathlib import Path
 
 from loguru import logger
 import yaml
 
-from mlops_rakuten.config import (
+from mlops_rakuten.config.constants import (
     CONFIG_FILE_PATH,
     INTERIM_DATA_DIR,
     MODELS_DIR,
     PROCESSED_DATA_DIR,
+    RAKUTEN_DATA_DIR,
     RAW_DATA_DIR,
     REPORTS_DIR,
+    SEEDS_DATA_DIR,
 )
-from mlops_rakuten.entities import (
+from mlops_rakuten.config.entities import (
     DataIngestionConfig,
     DataPreprocessingConfig,
+    DataSeedingConfig,
     DataTransformationConfig,
     ModelEvaluationConfig,
     ModelTrainerConfig,
     PredictionConfig,
 )
+from mlops_rakuten.utils import create_directories, get_latest_run_dir
 
 
 class ConfigurationManager:
@@ -36,6 +41,38 @@ class ConfigurationManager:
         with open(config_path, "r") as f:
             self._config = yaml.safe_load(f)
 
+    def get_data_seeding_config(self) -> DataSeedingConfig:
+        """
+        Construit un DataSeedingConfig à partir de la section
+        'data_seeding' du YAML, en utilisant avec RAKUTEN_DATA_DIR.
+        """
+        c = self._config["data_seeding"]
+
+        x_path = RAKUTEN_DATA_DIR / c["x_train_filename"]
+        y_path = RAKUTEN_DATA_DIR / c["y_train_filename"]
+        full_path = SEEDS_DATA_DIR / c["output_full_dataset_filename"]
+        remainder_path = SEEDS_DATA_DIR / c["output_remainder_dataset_filename"]
+        dataset_path = INTERIM_DATA_DIR / c["output_dataset_filename"]
+
+        logger.debug(f"x_train_path resolved to: {x_path}")
+        logger.debug(f"y_train_path resolved to: {y_path}")
+        logger.debug(f"output_full_path resolved to: {full_path}")
+        logger.debug(f"output_remainder_path resolved to: {remainder_path}")
+        logger.debug(f"output_dataset_path resolved to: {dataset_path}")
+
+        return DataSeedingConfig(
+            x_train_path=x_path,
+            y_train_path=y_path,
+            output_full_path=full_path,
+            output_remainder_path=remainder_path,
+            output_dataset_path=dataset_path,
+            seeds_dir=SEEDS_DATA_DIR,
+            text_column=c["text_column"],
+            target_column=c["target_column"],
+            batch_size=c["batch_size"],
+            n_batches=c["n_batches"],
+        )
+
     def get_data_ingestion_config(self) -> DataIngestionConfig:
         """
         Construit un DataIngestionConfig à partir de la section
@@ -43,18 +80,14 @@ class ConfigurationManager:
         """
         c = self._config["data_ingestion"]
 
-        x_path = RAW_DATA_DIR / c["x_train_filename"]
-        y_path = RAW_DATA_DIR / c["y_train_filename"]
-        output_path = INTERIM_DATA_DIR / c["output_dataset_filename"]
+        train_path = INTERIM_DATA_DIR / c["train_filename"]
 
-        logger.debug(f"x_train_path resolved to: {x_path}")
-        logger.debug(f"y_train_path resolved to: {y_path}")
-        logger.debug(f"output_path resolved to: {output_path}")
+        logger.debug(f"train_path resolved to: {train_path}")
 
         return DataIngestionConfig(
-            x_train_path=x_path,
-            y_train_path=y_path,
-            output_path=output_path,
+            train_path=train_path,
+            text_column=c["text_column"],
+            target_column=c["target_column"],
         )
 
     def get_data_preprocessing_config(self) -> DataPreprocessingConfig:
@@ -65,7 +98,11 @@ class ConfigurationManager:
         c = self._config["data_preprocessing"]
 
         input_path = INTERIM_DATA_DIR / c["input_dataset_filename"]
-        output_path = INTERIM_DATA_DIR / c["output_dataset_filename"]
+
+        run_id = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+        output_dir = INTERIM_DATA_DIR / run_id
+        create_directories([output_dir])
+        output_path = output_dir / c["output_dataset_filename"]
 
         logger.debug(f"input_dataset_path resolved to: {input_path}")
         logger.debug(f"output_dataset_path resolved to: {output_path}")
@@ -98,8 +135,18 @@ class ConfigurationManager:
         """
         c = self._config["data_transformation"]
 
-        input_path = INTERIM_DATA_DIR / c["input_dataset_filename"]
-        output_dir = PROCESSED_DATA_DIR
+        # Trouver le dernier run de preprocessing
+        logger.info(f"Recherche du dernier preprocessing dans : {INTERIM_DATA_DIR}")
+        latest_preproc_dir = get_latest_run_dir(INTERIM_DATA_DIR)
+
+        input_path = latest_preproc_dir / c["input_dataset_filename"]
+        if not input_path.exists():
+            logger.error(f"Fichier manquant : {input_path}")
+            raise FileNotFoundError(f"{input_path} introuvable")
+
+        run_id = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+        output_dir = PROCESSED_DATA_DIR / run_id
+        create_directories([output_dir])
 
         return DataTransformationConfig(
             input_dataset_path=input_path,
@@ -135,15 +182,22 @@ class ConfigurationManager:
         """
         c = self._config["model_trainer"]
 
-        model_dir = MODELS_DIR
+        # Trouver le dernier run de transformation
+        logger.info(f"Recherche de la dernière transformation dans : {PROCESSED_DATA_DIR}")
+        latest_transformation_dir = get_latest_run_dir(PROCESSED_DATA_DIR)
+
+        X_train_path = latest_transformation_dir / c["X_train_filename"]
+        y_train_path = latest_transformation_dir / c["y_train_filename"]
+
+        # Créer le répertoire dans modèle
+        run_id = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+        model_dir = MODELS_DIR / run_id
+        create_directories([model_dir])
         model_path = model_dir / c["model_filename"]
 
-        X_train_path = PROCESSED_DATA_DIR / c["X_train_filename"]
-        y_train_path = PROCESSED_DATA_DIR / c["y_train_filename"]
-
-        logger.debug(f"model_path resolved to: {model_path}")
         logger.debug(f"X_train_path resolved to: {X_train_path}")
         logger.debug(f"y_train_path resolved to: {y_train_path}")
+        logger.debug(f"model_path resolved to: {model_path}")
 
         return ModelTrainerConfig(
             model_path=model_path,
@@ -168,13 +222,23 @@ class ConfigurationManager:
         """
         c = self._config["model_evaluation"]
 
-        X_val_path = PROCESSED_DATA_DIR / c["X_val_filename"]
-        y_val_path = PROCESSED_DATA_DIR / c["y_val_filename"]
+        # Trouver le dernier run de transformation
+        logger.info(f"Recherche de la dernière transformation dans : {PROCESSED_DATA_DIR}")
+        latest_transformation_dir = get_latest_run_dir(PROCESSED_DATA_DIR)
 
-        model_dir = MODELS_DIR
-        model_path = model_dir / c["model_filename"]
+        X_val_path = latest_transformation_dir / c["X_val_filename"]
+        y_val_path = latest_transformation_dir / c["y_val_filename"]
 
-        metrics_dir = REPORTS_DIR
+        # Trouver le dernier modèle
+        logger.info(f"Recherche du dernier modèle dans : {MODELS_DIR}")
+        latest_model_dir = get_latest_run_dir(MODELS_DIR)
+
+        model_path = latest_model_dir / c["model_filename"]
+
+        # Créer le répertoire dans modèle
+        run_id = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+        metrics_dir = REPORTS_DIR / run_id
+        create_directories([metrics_dir])
         metrics_path = metrics_dir / c["metrics_filename"]
         classification_report_path = metrics_dir / c["classification_report_filename"]
         confusion_matrix_path = metrics_dir / c["confusion_matrix_filename"]
@@ -199,7 +263,7 @@ class ConfigurationManager:
     def get_prediction_config(self) -> PredictionConfig:
         """
         Construit un PredictionConfig à partir de la section
-        'prediction' du YAML, en combinant avec PROCESSED_DATA_DIR / MODELS_DIR.
+        'prediction' du YAML, en combinant avec PROCESSED_DATA_DIR / MODELS_DIR / RAW_DATA_DIR.
 
         Cette configuration permet de :
         - recharger le vectorizer TF-IDF
@@ -208,17 +272,38 @@ class ConfigurationManager:
         """
         c = self._config["prediction"]
 
-        vectorizer_path = PROCESSED_DATA_DIR / c["vectorizer_filename"]
-        label_encoder_path = PROCESSED_DATA_DIR / c["label_encoder_filename"]
-        model_path = MODELS_DIR / c["model_filename"]
+        # Trouver le dernier run de transformation
+        logger.info(f"Recherche de la dernière transformation dans : {PROCESSED_DATA_DIR}")
+        latest_transformation_dir = get_latest_run_dir(PROCESSED_DATA_DIR)
+
+        vectorizer_path = latest_transformation_dir / c["vectorizer_filename"]
+        label_encoder_path = latest_transformation_dir / c["label_encoder_filename"]
+
+        # Trouver le dernier modèle
+        logger.info(f"Recherche du dernier modèle dans : {MODELS_DIR}")
+        latest_model_dir = get_latest_run_dir(MODELS_DIR)
+
+        model_path = latest_model_dir / c["model_filename"]
+
+        categories_path = None
+        code_col = None
+        name_col = None
+        if "categories_filename" in c:
+            categories_path = RAW_DATA_DIR / c["categories_filename"]
+            code_col = c.get("category_code_column", "prdtypecode")
+            name_col = c.get("category_name_column", "category_name")
 
         logger.debug(f"vectorizer_path resolved to: {vectorizer_path}")
         logger.debug(f"label_encoder_path resolved to: {label_encoder_path}")
         logger.debug(f"model_path resolved to: {model_path}")
+        logger.debug(f"categories_path resolved to: {categories_path}")
 
         return PredictionConfig(
             vectorizer_path=vectorizer_path,
             label_encoder_path=label_encoder_path,
             model_path=model_path,
             text_column=c["text_column"],
+            categories_path=categories_path,
+            category_code_column=code_col,
+            category_name_column=name_col,
         )

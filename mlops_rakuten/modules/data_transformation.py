@@ -10,7 +10,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
-from mlops_rakuten.entities import DataTransformationConfig
+from mlops_rakuten.config.entities import DataTransformationConfig
 from mlops_rakuten.utils import create_directories
 
 
