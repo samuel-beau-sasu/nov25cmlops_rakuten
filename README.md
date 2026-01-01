@@ -191,7 +191,7 @@ Exécuter la Pipeline pour entrainer le modèle initial
    `$ make train`
 
 Exécuter la Pipeline pour l'ingestion de données
-   `$ make ingest CSV_PATH=data/raw/rakuten/seeds/rakuten_batch_0005.csv"`
+   `$ make ingest CSV_PATH=data/raw/rakuten/seeds/rakuten_batch_0005.csv`
 
 Exécuter la Pipeline pour une inférence
    `$ make predict TEXT="Très joli pull pour enfants"`
