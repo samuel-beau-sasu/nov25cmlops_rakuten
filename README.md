@@ -219,14 +219,25 @@ Pour accéder à l'API
 
 ## Docker
 
-Lancer les 2 conteneurs (build de l'image et run du conteneur) rakuten-api-train et rakuten-api-inference
-`$ make start`
+### Uniquement au lancement de l'application (training)
+Lancer le conteneur (build de l'image et run du conteneur) rakuten-api-inference
+`$ make docker-init`
+
+Bootstrapper les data dans le docker volume
+`$ make docker-bootstrap`
+
+Créer les data brutes initiales
+`$ make docker-seed`
+
+### Pour gérer le cycle de vie de l'application (inférence)
+Lancer le conteneur (build de l'image et run du conteneur) rakuten-api-inference
+`$ make docker-start`
 
 Arrêter les conteneurs
-`$ make stop`
+`$ make docker-stop`
 
-Relancer automatiquement les conteneurs
-`$ make rerun`
+Relancer automatiquement le conteneur rakuten-api-inference
+`$ make docker-rerun`
 
 ---
 

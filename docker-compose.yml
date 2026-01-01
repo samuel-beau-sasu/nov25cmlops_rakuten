@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   api-train:
     image: rakuten-api-train
@@ -7,11 +5,10 @@ services:
       context: .
       dockerfile: docker/api-train/Dockerfile
     volumes:
-      - ./data:/app/data
-      - ./models:/app/models
-      - ./reports:/app/reports
-      - ./uploads:/app/uploads
-    command: python -m mlops_rakuten.main seed
+      - rakuten_data:/app/data
+      - rakuten_models:/app/models
+      - rakuten_reports:/app/reports
+      - rakuten_uploads:/app/uploads
     restart: "no"
 
   api-inference:
@@ -22,10 +19,19 @@ services:
     depends_on:
       - api-train
     volumes:
-      - ./data:/app/data:ro
-      - ./models:/app/models:ro
-      - ./reports:/app/reports:ro
+      - rakuten_data:/app/data:ro
+      - rakuten_models:/app/models:ro
+      - rakuten_reports:/app/reports:ro
     ports:
       - "8000:8000"
-    command: uvicorn mlops_rakuten.api:app --host 0.0.0.0 --port 8000
     restart: unless-stopped
+
+volumes:
+  rakuten_data:
+    name: rakuten_data
+  rakuten_models:
+    name: rakuten_models
+  rakuten_reports:
+    name: rakuten_reports
+  rakuten_uploads:
+    name: rakuten_uploads

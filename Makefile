@@ -99,41 +99,7 @@ predict: requirements
 
 
 #################################################################################
-# DOCKER                                                                        #
-#################################################################################
-
-.PHONY: docker-build
-docker-build:
-	docker build -f docker/api-train/Dockerfile -t rakuten-api-train .
-	docker build -f docker/api-inference/Dockerfile -t rakuten-api-inference .
-
-.PHONY: docker-run-train
-docker-run-train:
-	docker run --rm \
-		-v "$(PWD)/data:/app/data" \
-		-v "$(PWD)/models:/app/models" \
-		-v "$(PWD)/reports:/app/reports" \
-		-v "$(PWD)/uploads:/app/uploads" \
-		rakuten-api-train \
-		python -m mlops_rakuten.main seed
-
-
-.PHONY: docker-run-inference
-docker-run-inference:
-	docker run --rm -p 8000:8000 \
-		-v "$(PWD)/data:/app/data:ro" \
-		-v "$(PWD)/models:/app/models:ro" \
-		-v "$(PWD)/reports:/app/reports:ro" \
-		rakuten-api-inference
-
-
-.PHONY: docker-stop
-docker-stop:
-	docker stop rakuten-api-train rakuten-api-inference || true
-
-
-#################################################################################
-# DOCKER COMPOSE (portable v1 / v2)
+# DOCKER COMPOSE
 #################################################################################
 
 COMPOSE_CMD := $(shell \
@@ -145,18 +111,43 @@ COMPOSE_CMD := $(shell \
 )
 
 
-.PHONY: start
-start:
-	$(COMPOSE_CMD) up -d --build
+.PHONY: docker-start
+docker-start:
+	$(COMPOSE_CMD) up -d --build api-inference
 
 
-.PHONY: stop
-stop:
+.PHONY: docker-stop
+docker-stop:
 	$(COMPOSE_CMD) down
 
 
-.PHONY: rerun
-rerun: stop start
+.PHONY: docker-rerun
+docker-rerun: docker-stop docker-start
+
+
+#################################################################################
+# DATA / ML JOBS
+#################################################################################
+
+
+.PHONY: docker-init
+docker-init:
+	$(COMPOSE_CMD) up -d --build api-train
+
+
+.PHONY: docker-bootstrap
+docker-bootstrap:
+	docker run --rm \
+		-v rakuten_data:/app/data \
+		-v $(PWD)/data/raw:/bootstrap/raw:ro \
+		alpine \
+		sh -c "mkdir -p /app/data/raw && cp -r /bootstrap/raw/* /app/data/raw/"
+
+
+.PHONY: docker-seed
+docker-seed:
+	$(COMPOSE_CMD) run --rm api-train \
+		python -m mlops_rakuten.main seed
 
 
 #################################################################################
