@@ -134,7 +134,7 @@ COMPOSE_CMD := $(shell \
 
 .PHONY: docker-start
 docker-start:
-	$(COMPOSE_CMD) up -d --build nginx api-inference
+	$(COMPOSE_CMD) up -d --build api-inference nginx nginx_exporter prometheus grafana
 
 
 .PHONY: docker-init

@@ -39,6 +39,43 @@ services:
       - ./deployments/nginx/certs:/etc/nginx/certs:ro
     restart: unless-stopped
 
+  nginx_exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: rakuten-nginx-exporter
+    ports:
+      - "9113:9113"
+    depends_on:
+      - nginx
+    environment:
+      SCRAPE_URI: https://nginx/nginx_status
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: rakuten-prometheus-server
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./deployments/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - rakuten_prometheus_data:/prometheus
+    depends_on:
+      - nginx_exporter
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: rakuten-grafana-dashboard
+    ports:
+      - "3000:3000"
+    volumes:
+      - rakuten_grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    restart: unless-stopped
+
 volumes:
   rakuten_data:
     name: rakuten_data
@@ -48,3 +85,7 @@ volumes:
     name: rakuten_reports
   rakuten_uploads:
     name: rakuten_uploads
+  rakuten_prometheus_data:
+    name: rakuten_prometheus_data
+  rakuten_grafana_data:
+    name: rakuten_grafana_data

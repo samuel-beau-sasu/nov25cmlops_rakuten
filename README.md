@@ -27,8 +27,10 @@ Product type classification for Rakuten France
 │   ├── certs
 │   │   ├── nginx.crt       <- Nginx certificate
 │   │   └── nginx.key       <- Certificate key
-│   └── nginx
-│       └── nginx.conf      <- Configuration for Nginx
+│   ├── nginx
+│   │   └── nginx.conf      <- Configuration for Nginx
+│   └── prometheus
+│       └── prometheus.yml  <- Configuration for Prometheus
 │
 ├── docs               <- A default mkdocs project; see www.mkdocs.org for details
 │
