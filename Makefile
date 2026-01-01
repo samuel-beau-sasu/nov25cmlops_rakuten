@@ -99,6 +99,40 @@ predict: requirements
 
 
 #################################################################################
+# DOCKER                                                                        #
+#################################################################################
+
+.PHONY: docker-build
+docker-build:
+	docker build -f docker/api-train/Dockerfile -t rakuten-api-train .
+	docker build -f docker/api-inference/Dockerfile -t rakuten-api-inference .
+
+.PHONY: docker-run-train
+docker-run-train:
+	docker run --rm \
+		-v "$(PWD)/data:/app/data" \
+		-v "$(PWD)/models:/app/models" \
+		-v "$(PWD)/reports:/app/reports" \
+		-v "$(PWD)/uploads:/app/uploads" \
+		rakuten-api-train \
+		python -m mlops_rakuten.main seed
+
+
+.PHONY: docker-run-inference
+docker-run-inference:
+	docker run --rm -p 8000:8000 \
+		-v "$(PWD)/data:/app/data:ro" \
+		-v "$(PWD)/models:/app/models:ro" \
+		-v "$(PWD)/reports:/app/reports:ro" \
+		rakuten-api-inference
+
+
+.PHONY: docker-stop
+docker-stop:
+	docker stop rakuten-api-train rakuten-api-inference || true
+
+
+#################################################################################
 # Self Documenting Commands                                                     #
 #################################################################################
 

@@ -15,13 +15,19 @@ Product type classification for Rakuten France
 │   ├── processed      <- The final, canonical data sets for modeling.
 │   └── raw            <- The original, immutable data dump.
 │
+├── docker
+│   ├── api-inference
+│   │   └── Dockerfile      <- Configuration for the Inference container
+│   └── api-train
+│       └── Dockerfile      <- Configuration for the Training container
+│
 ├── docs               <- A default mkdocs project; see www.mkdocs.org for details
 │
 ├── logs               <- Contains all log and error files
 │
 ├── models             <- Trained and serialized models, model predictions, or model summaries
 │
-├── notebooks          
+├── notebooks
 │   └── 01_exploration.ipynb  <- Text data exploration
 │
 │
@@ -72,7 +78,7 @@ Product type classification for Rakuten France
     │   ├── data_ingestion.py       <- Code to merge new dataset
     │   ├── data_preprocessing.py   <- Code to clean data
     │   ├── data_transformation.py  <- Code for TF-IDF and train / test split
-    │ source .venv/bin/activate  ├── model_trainer.py        <- Code for Linear SVC
+    │   ├── model_trainer.py        <- Code for Linear SVC
     │   ├── model_evaluation.py     <- Code for evaluating Linear SVC performances
     │   └── prediction.py           <- Code for running inference
     │
