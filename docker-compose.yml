@@ -21,9 +21,10 @@ services:
     depends_on:
       - api-train
     volumes:
-      - rakuten_data:/app/data:ro
-      - rakuten_models:/app/models:ro
-      - rakuten_reports:/app/reports:ro
+      - rakuten_data:/app/data
+      - rakuten_models:/app/models
+      - rakuten_reports:/app/reports
+      - rakuten_uploads:/app/uploads
     restart: unless-stopped
 
   nginx:

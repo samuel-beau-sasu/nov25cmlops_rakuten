@@ -20,7 +20,7 @@ from mlops_rakuten.auth.auth_simple import (
 from mlops_rakuten.config.constants import (
     MODELS_DIR,
     REPORTS_DIR,
-    UPLOADS_DIR,
+    UPLOADS_DATA_DIR,
 )
 from mlops_rakuten.pipelines.data_ingestion import DataIngestionPipeline
 from mlops_rakuten.pipelines.data_preprocessing import DataPreprocessingPipeline
@@ -285,9 +285,9 @@ async def ingest_csv(file: UploadFile = File(...), _=Depends(require_admin)) -> 
         raise HTTPException(
             status_code=400, detail="Le fichier doit être un .csv")
 
-    create_directories([UPLOADS_DIR])
+    create_directories([UPLOADS_DATA_DIR])
 
-    uploads_path = UPLOADS_DIR / file.filename
+    uploads_path = UPLOADS_DATA_DIR / file.filename
 
     # 1) Save incoming file
     try:
