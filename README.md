@@ -15,6 +15,8 @@ Product type classification for Rakuten France
 │   ├── processed      <- The final, canonical data sets for modeling.
 │   └── raw            <- The original, immutable data dump.
 │
+├── docker-compose.yml    <- Docker containers orchestration
+│
 ├── docker
 │   ├── api-inference
 │   │   └── Dockerfile      <- Configuration for the Inference container
@@ -212,6 +214,19 @@ Lancer l'application FastAPI
 
 Pour accéder à l'API
    [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+---
+
+## Docker
+
+Lancer les 2 conteneurs (build de l'image et run du conteneur) rakuten-api-train et rakuten-api-inference
+`$ make start`
+
+Arrêter les conteneurs
+`$ make stop`
+
+Relancer automatiquement les conteneurs
+`$ make rerun`
 
 ---
 

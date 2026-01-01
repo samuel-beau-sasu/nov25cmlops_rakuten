@@ -133,6 +133,33 @@ docker-stop:
 
 
 #################################################################################
+# DOCKER COMPOSE (portable v1 / v2)
+#################################################################################
+
+COMPOSE_CMD := $(shell \
+	if command -v docker-compose >/dev/null 2>&1; then \
+		echo docker-compose; \
+	else \
+		echo docker compose; \
+	fi \
+)
+
+
+.PHONY: start
+start:
+	$(COMPOSE_CMD) up -d --build
+
+
+.PHONY: stop
+stop:
+	$(COMPOSE_CMD) down
+
+
+.PHONY: rerun
+rerun: stop start
+
+
+#################################################################################
 # Self Documenting Commands                                                     #
 #################################################################################
 
