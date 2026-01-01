@@ -99,6 +99,27 @@ predict: requirements
 
 
 #################################################################################
+# DATA / ML JOBS
+#################################################################################
+
+
+.PHONY: docker-bootstrap
+docker-bootstrap:
+	$(COMPOSE_CMD) up -d --build api-train
+	docker run --rm \
+		-v rakuten_data:/app/data \
+		-v $(PWD)/data/raw:/bootstrap/raw:ro \
+		alpine \
+		sh -c "mkdir -p /app/data/raw && cp -r /bootstrap/raw/* /app/data/raw/"
+
+
+.PHONY: docker-seed
+docker-seed:
+	$(COMPOSE_CMD) run --rm api-train \
+		python -m mlops_rakuten.main seed
+
+
+#################################################################################
 # DOCKER COMPOSE
 #################################################################################
 
@@ -113,7 +134,11 @@ COMPOSE_CMD := $(shell \
 
 .PHONY: docker-start
 docker-start:
-	$(COMPOSE_CMD) up -d --build api-inference
+	$(COMPOSE_CMD) up -d --build nginx api-inference
+
+
+.PHONY: docker-init
+docker-init: docker-bootstrap docker-seed docker-start
 
 
 .PHONY: docker-stop
@@ -123,31 +148,6 @@ docker-stop:
 
 .PHONY: docker-rerun
 docker-rerun: docker-stop docker-start
-
-
-#################################################################################
-# DATA / ML JOBS
-#################################################################################
-
-
-.PHONY: docker-init
-docker-init:
-	$(COMPOSE_CMD) up -d --build api-train
-
-
-.PHONY: docker-bootstrap
-docker-bootstrap:
-	docker run --rm \
-		-v rakuten_data:/app/data \
-		-v $(PWD)/data/raw:/bootstrap/raw:ro \
-		alpine \
-		sh -c "mkdir -p /app/data/raw && cp -r /bootstrap/raw/* /app/data/raw/"
-
-
-.PHONY: docker-seed
-docker-seed:
-	$(COMPOSE_CMD) run --rm api-train \
-		python -m mlops_rakuten.main seed
 
 
 #################################################################################

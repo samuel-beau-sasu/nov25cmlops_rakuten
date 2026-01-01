@@ -13,6 +13,8 @@ services:
 
   api-inference:
     image: rakuten-api-inference
+#    deploy:
+#      replicas: 3 # Lance 3 instances de ce service
     build:
       context: .
       dockerfile: docker/api-inference/Dockerfile
@@ -22,8 +24,20 @@ services:
       - rakuten_data:/app/data:ro
       - rakuten_models:/app/models:ro
       - rakuten_reports:/app/reports:ro
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: rakuten-nginx
+    depends_on:
+      - api-inference
     ports:
-      - "8000:8000"
+      - "8080:80"
+      - "443:443"
+    volumes:
+      - ./deployments/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./deployments/nginx/certs:/etc/nginx/certs:ro
+      - ./deployments/nginx/.htpasswd:/etc/nginx/.htpasswd:ro
     restart: unless-stopped
 
 volumes:

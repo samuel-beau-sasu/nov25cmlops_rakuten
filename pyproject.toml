@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "mlops_rakuten"
-version = "0.0.1"
+version = "0.2.0"
 description = "Product type classification for Rakuten France"
 authors = [
   { name = "C. Fabre J. Therier S. Beau" },

@@ -23,6 +23,14 @@ Product type classification for Rakuten France
 │   └── api-train
 │       └── Dockerfile      <- Configuration for the Training container
 │
+├── deployments
+│   ├── .htpasswd           <- File for htpasswd access control
+│   ├── certs
+│   │   ├── nginx.crt       <- Nginx certificate
+│   │   └── nginx.key       <- Certificate key
+│   └── nginx
+│       └── nginx.conf      <- Configuration for Nginx
+│
 ├── docs               <- A default mkdocs project; see www.mkdocs.org for details
 │
 ├── logs               <- Contains all log and error files
@@ -217,10 +225,21 @@ Pour accéder à l'API
 
 ---
 
+## Sécurité Nginx
+
+Pour générer un certificat auto-signé
+`$ mkcert -key-file deployments/nginx/certs/nginx.key -cert-file deployments/nginx/certs/nginx.crt localhost 127.0.0.1 ::1`
+
+Et pour htpasswd
+`$ htpasswd -c deployments/nginx/.htpasswd admin`
+avec admin:passwd123
+
+---
+
 ## Docker
 
 ### Uniquement au lancement de l'application (training)
-Lancer le conteneur (build de l'image et run du conteneur) rakuten-api-inference
+Lancer les conteneur (build de l'image et run du conteneur) nginx rakuten-api-train et rakuten-api-inference
 `$ make docker-init`
 
 Bootstrapper les data dans le docker volume
@@ -230,14 +249,17 @@ Créer les data brutes initiales
 `$ make docker-seed`
 
 ### Pour gérer le cycle de vie de l'application (inférence)
-Lancer le conteneur (build de l'image et run du conteneur) rakuten-api-inference
+Lancer les conteneurs (build de l'image et run du conteneur) nginx et rakuten-api-inference
 `$ make docker-start`
 
 Arrêter les conteneurs
 `$ make docker-stop`
 
-Relancer automatiquement le conteneur rakuten-api-inference
+Relancer automatiquement les conteneurs nginx rakuten-api-inference
 `$ make docker-rerun`
+
+Pour accéder à l'API
+   [https://127.0.0.1:80/docs](https://127.0.0.1:80/docs)
 
 ---
 

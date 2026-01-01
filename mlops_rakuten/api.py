@@ -36,7 +36,7 @@ REQUIRED_COLUMNS = ["designation", "prdtypecode"]
 app = FastAPI(
     title="Rakuten Product Classification API",
     description="API d'inférence pour la classification de produits Rakuten.",
-    version="0.1.0",
+    version="0.2.0",
 )
 
 
@@ -76,14 +76,17 @@ def validate_uploaded_batch_csv(csv_path: Path) -> None:
     # designation -> str (et non vide)
     df["designation"] = df["designation"].astype(str).str.strip()
     if (df["designation"].str.len() < 10).any():
-        raise ValueError("Certaines 'designation' font moins de 10 caractères après strip().")
+        raise ValueError(
+            "Certaines 'designation' font moins de 10 caractères après strip().")
 
     # prdtypecode -> int strict
     # (si le CSV contient des "10.0" ou " 10", ça doit passer proprement)
     try:
-        df["prdtypecode"] = pd.to_numeric(df["prdtypecode"], errors="raise").astype(int)
+        df["prdtypecode"] = pd.to_numeric(
+            df["prdtypecode"], errors="raise").astype(int)
     except Exception as e:
-        raise ValueError("La colonne 'prdtypecode' doit être convertible en int.") from e
+        raise ValueError(
+            "La colonne 'prdtypecode' doit être convertible en int.") from e
 
 
 # Initialisation Pipeline
@@ -104,7 +107,8 @@ class PredictionRequest(BaseModel):
     def strip_and_check(cls, v: str) -> str:
         v = v.strip()
         if len(v) < 10:
-            raise ValueError("La designation doit contenir au moins 10 caractères non vides.")
+            raise ValueError(
+                "La designation doit contenir au moins 10 caractères non vides.")
         return v
 
 
@@ -174,7 +178,8 @@ async def token(form_data: OAuth2PasswordRequestForm = Depends()):
             detail="Identifiants invalides",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token = create_access_token(username=user["username"], role=user["role"])
+    access_token = create_access_token(
+        username=user["username"], role=user["role"])
     return {"access_token": access_token, "token_type": "bearer"}
 
 
@@ -201,10 +206,12 @@ async def get_model_config(_=Depends(require_admin)):
         raise HTTPException(status_code=404, detail=str(e)) from e
     except json.JSONDecodeError as e:
         logger.error(f"JSON invalide: {e}")
-        raise HTTPException(status_code=500, detail=f"JSON invalide: {e}") from e
+        raise HTTPException(
+            status_code=500, detail=f"JSON invalide: {e}") from e
     except Exception as e:
         logger.exception("Erreur inattendue dans /model/config")
-        raise HTTPException(status_code=500, detail="Erreur interne serveur") from e
+        raise HTTPException(
+            status_code=500, detail="Erreur interne serveur") from e
 
 
 @app.get("/model/metrics", response_model=ModelMetricsResponse)
@@ -230,10 +237,12 @@ async def get_model_metrics(_=Depends(require_admin)):
         raise HTTPException(status_code=404, detail=str(e)) from e
     except json.JSONDecodeError as e:
         logger.error(f"JSON invalide: {e}")
-        raise HTTPException(status_code=500, detail=f"JSON invalide: {e}") from e
+        raise HTTPException(
+            status_code=500, detail=f"JSON invalide: {e}") from e
     except Exception as e:
         logger.exception("Erreur inattendue dans /model/metrics")
-        raise HTTPException(status_code=500, detail="Erreur interne serveur") from e
+        raise HTTPException(
+            status_code=500, detail="Erreur interne serveur") from e
 
 
 @app.get("/model/classification", response_model=ModelClassificationResponse)
@@ -259,7 +268,8 @@ async def get_model_classification_report(_=Depends(require_admin)):
         raise HTTPException(status_code=404, detail=str(e)) from e
     except Exception as e:
         logger.exception("Erreur inattendue dans /model/classification")
-        raise HTTPException(status_code=500, detail="Erreur interne serveur") from e
+        raise HTTPException(
+            status_code=500, detail="Erreur interne serveur") from e
 
 
 @app.post("/ingest")
@@ -272,7 +282,8 @@ async def ingest_csv(file: UploadFile = File(...), _=Depends(require_admin)) -> 
 
     # 0) basic checks
     if not file.filename.lower().endswith(".csv"):
-        raise HTTPException(status_code=400, detail="Le fichier doit être un .csv")
+        raise HTTPException(
+            status_code=400, detail="Le fichier doit être un .csv")
 
     create_directories([UPLOADS_DIR])
 
@@ -297,12 +308,14 @@ async def ingest_csv(file: UploadFile = File(...), _=Depends(require_admin)) -> 
         logger.success("Validation du CSV OK")
     except Exception as e:
         logger.error(f"Validation échouée: {e}")
-        raise HTTPException(status_code=422, detail=f"CSV invalide: {e}") from e
+        raise HTTPException(
+            status_code=422, detail=f"CSV invalide: {e}") from e
 
     # 3) Ingestion (append au dataset courant) + training chain
     try:
         ingestion_pipeline = DataIngestionPipeline()
-        ingested_dataset_path = ingestion_pipeline.run(uploaded_csv_path=uploads_path)
+        ingested_dataset_path = ingestion_pipeline.run(
+            uploaded_csv_path=uploads_path)
 
         preprocessing_path = DataPreprocessingPipeline().run()
         transformation_path = DataTransformationPipeline().run()
@@ -323,4 +336,5 @@ async def ingest_csv(file: UploadFile = File(...), _=Depends(require_admin)) -> 
         raise
     except Exception as e:
         logger.exception("Erreur lors du pipeline ingestion+train")
-        raise HTTPException(status_code=500, detail="Erreur pipeline ingestion+train") from e
+        raise HTTPException(
+            status_code=500, detail="Erreur pipeline ingestion+train") from e
