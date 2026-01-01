@@ -24,7 +24,6 @@ Product type classification for Rakuten France
 │       └── Dockerfile      <- Configuration for the Training container
 │
 ├── deployments
-│   ├── .htpasswd           <- File for htpasswd access control
 │   ├── certs
 │   │   ├── nginx.crt       <- Nginx certificate
 │   │   └── nginx.key       <- Certificate key
@@ -229,10 +228,6 @@ Pour accéder à l'API
 
 Pour générer un certificat auto-signé
 `$ mkcert -key-file deployments/nginx/certs/nginx.key -cert-file deployments/nginx/certs/nginx.crt localhost 127.0.0.1 ::1`
-
-Et pour htpasswd
-`$ htpasswd -c deployments/nginx/.htpasswd admin`
-avec admin:passwd123
 
 ---
 
