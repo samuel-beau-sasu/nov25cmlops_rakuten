@@ -15,6 +15,7 @@ PYTHON_INTERPRETER = python
 .PHONY: requirements
 requirements:
 	uv pip install -r requirements.txt
+	uv pip install -r requirements-dev.txt
 
 
 ## Delete all compiled Python files

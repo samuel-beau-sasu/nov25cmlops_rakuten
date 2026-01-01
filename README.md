@@ -33,8 +33,9 @@ Product type classification for Rakuten France
 ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
 │   └── figures        <- Generated graphics and figures to be used in reporting
 │
-├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-│                         generated with `pip freeze > requirements.txt`
+├── requirements-dev.txt   <- The requirements file for development environment
+│
+├── requirements.txt   <- The requirements file for reproducing the analysis environment
 │
 ├── tests
 │   ├── test_pipelines.py            <- Test all the pipelines
