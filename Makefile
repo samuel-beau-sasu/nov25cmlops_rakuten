@@ -98,6 +98,26 @@ predict: requirements
 
 
 #################################################################################
+# DVC & DAGHUB                                             						#
+#################################################################################
+
+## Initialize DVC config.local with credentials interactively
+.PHONY: dvc-credentials
+dvc-credentials:
+	@echo "Création du fichier .dvc/config.local avec les identifiants DagsHub"
+	@read -p "Enter DagsHub Access Key ID: " ACCESS_KEY; \
+	read -p "Enter DagsHub Secret Access Key: " SECRET_KEY; \
+	dvc remote modify origin --local access_key_id $$ACCESS_KEY; \
+	dvc remote modify origin --local secret_access_key $$SECRET_KEY;
+	@echo ".dvc/config.local crée avec succès."
+
+## Test DVC connection to Dagshub s3 remote storage
+.PHONY: dvc-test
+dvc-test:
+	@echo "Test connexion DVC vers DagsHub..."
+	@dvc status && echo "Connected to DagsHub" || echo "Connection failed"
+
+#################################################################################
 # Self Documenting Commands                                                     #
 #################################################################################
 

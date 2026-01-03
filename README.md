@@ -198,6 +198,40 @@ Exécuter la Pipeline pour une inférence
 
 ---
 
+## DVC et DagsHub
+
+### Configuration
+
+DVC est configuré pour utiliser DagsHub pour le versioning des données.
+
+#### 1. Ajouter vos identifiants DagsHub
+```bash
+make dvc-credentials
+```
+
+Lorsque demandé, entrez vos identifiants présent sur le repo Dagshub.
+
+#### 2. Tester la connexion
+```bash
+make dvc-test
+```
+
+Devrait afficher: `Connected to DagsHub`
+
+### Fichiers
+
+- `.dvc/config` - Configuration publique (committée)
+- `.dvc/config.local` - Vos identifiants (gitignorée, local uniquement)
+
+### Configuration du Remote
+
+- **Nom**: origin
+- **Stockage**: DagsHub S3
+- **URL**: https://dagshub.com/shiff-oumi/nov25cmlops_rakuten_dag.s3
+
+---
+---
+
 ## Application FastAPI
 
 Lancer l'application FastAPI
