@@ -267,10 +267,16 @@ ls data/raw/rakuten/*.dvc
 
 #### Committer dans Git
 ```bash
-# Ajouter les pointeurs DVC
-git add data/raw/rakuten/*.dvc
-git add data/raw/*.dvc
-git add data/.gitignore
+# Ajouter data/ 
+git add data/
+
+# Vérification
+git status
+# Doit afficher :
+#   new file:   data/.gitignore
+#   new file:   data/raw/rakuten/X_train_update.csv.dvc
+#   new file:   data/raw/rakuten/Y_train_CVw08PX.csv.dvc
+#   new file:   data/raw/product_categories.csv.dvc
 
 # Committer
 git commit -m "DVC : Tracking des raws datas"
