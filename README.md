@@ -13,7 +13,19 @@ Product type classification for Rakuten France
 │   ├── external       <- Data from third party sources.
 │   ├── interim        <- Intermediate data that has been transformed.
 │   ├── processed      <- The final, canonical data sets for modeling.
-│   └── raw            <- The original, immutable data dump.
+│   └── raw/
+│       ├── rakuten/
+│       │   ├── X_train_update.csv       Tracked by DVC
+│       │   ├── X_train_update.csv.dvc   <- DVC pointer
+│       │   ├── Y_train_CVw08PX.csv      Tracked by DVC
+│       │   └── Y_train_CVw08PX.csv.dvc  <- DVC pointer
+│       ├── product_categories.csv       Tracked by DVC
+│       └── product_categories.csv.dvc   <- DVC pointer
+│
+├── .dvc/
+│   ├── config                  <- Public configuration
+│   ├── .gitignore              <- Ignore config.local
+│   └── config.local            <- secrets (not committed)
 │
 ├── docs               <- A default mkdocs project; see www.mkdocs.org for details
 │
@@ -204,7 +216,7 @@ Exécuter la Pipeline pour une inférence
 
 DVC est configuré pour utiliser DagsHub pour le versioning des données.
 
-#### 1. Ajouter vos identifiants DagsHub
+#### 1. Ajouter les identifiants DagsHub
 ```bash
 make dvc-credentials
 ```
@@ -229,6 +241,53 @@ Devrait afficher: `Connected to DagsHub`
 - **Stockage**: DagsHub S3
 - **URL**: https://dagshub.com/shiff-oumi/nov25cmlops_rakuten_dag.s3
 
+### Données Trackées
+
+Les données brutes sont versionnées avec DVC:
+
+```
+data/raw/
+├── rakuten/
+│   ├── X_train_update.csv        
+│   └── Y_train_CVw08PX.csv               
+└── product_categories.csv
+```
+#### Tracker les données
+```bash
+# Commenter le tracking de /data/ dans le .ignore
+
+# Ajouter les fichiers avec DVC
+dvc add data/raw/rakuten/X_train_update.csv
+dvc add data/raw/rakuten/Y_train_CVw08PX.csv
+dvc add data/raw/product_categories.csv
+
+# Vérifier les fichiers .dvc créés
+ls data/raw/rakuten/*.dvc
+```
+
+#### Committer dans Git
+```bash
+# Ajouter les pointeurs DVC
+git add data/raw/rakuten/*.dvc
+git add data/raw/*.dvc
+git add data/.gitignore
+
+# Committer
+git commit -m "DVC : Tracking des raws datas"
+
+# Pousser vers le repo
+git push 
+```
+
+#### Pousser les données vers DagsHub
+```bash
+# Envoyer les données sur DagsHub
+dvc push
+
+# Vérifier
+dvc status
+# Doit afficher : Everything is up to date
+```
 ---
 ---
 
