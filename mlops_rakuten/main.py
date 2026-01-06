@@ -82,7 +82,6 @@ def ingest(uploaded_csv_path: str):
     ingestion_output_path = ingestion_pipeline.run(uploaded_csv_path)
     logger.info(f"Dataset fusionné disponible à : {ingestion_output_path}")
 
-    _run_training_chain()
 
 
 @app.command()

@@ -285,16 +285,239 @@ git commit -m "DVC : Tracking des raws datas"
 git push 
 ```
 
-#### Pousser les données vers DagsHub
+#### Initalisation du modèle Baseline
 ```bash
-# Envoyer les données sur DagsHub
-dvc push
+# récupérer les données depuis Dagshub
+dvc pull
 
 # Vérifier
 dvc status
 # Doit afficher : Everything is up to date
 ```
+Version 0 (V0) est la baseline immuable du modèle. Tous les futurs modèles (v0.1, v0.2, etc.) seront incrémentaux par rapport à cette V0.
+Lancement du l'initialisation de la pipeline complète (seeding,preprocess,transform,train,evaluate). L'ingestion n'est pas gèré pour le moment.
+
+#### Exécuter le Pipeline Complet
+
+```bash
+# Initialiser V0 (exécute seed → preprocess → transform → train → evaluate)
+$ make dvc-init
+
+# Résultat:
+# - dvc.lock créé avec tous les hashes
+# - dvc.yaml exécuté stage par stage
+# - Tous les outputs en cache local
+```
+#### Committer dans Git
+
+```bash
+# Ajouter dvc.lock (très important!)
+$ git add data/raw/rakuten/seeds/.gitignore dvc.lock
+# Committer
+$ git commit -m "v0: seed + full pipeline execution"
+
+# Pousser le code
+$ git push origin main
+```
+
+#### Pousser les Données (si l'on utilise Dagshub)
+
+```bash
+# Pousser tous les outputs vers DagsHub S3
+$ make dvc-push
+
+# Vérifier
+$ dvc status
+→ Everything is up to date
+```
+
+Avantage:
+- On peut utiliser `dvc pull` au lieu de relancer le pipeline
+
+#### Sur une Nouvelle Machine
+
+```bash
+
+# Configurer DagsHub
+$ make dvc-credentials
+
+# Récupérer les données depuis DagsHub
+$ make dvc-pull
+
+#Si l'on n'utilise pas Dagshub, passer directement a cette commande.
+§ make dvc-init
+
+# Vérifier
+$ dvc status
+→ Everything is up to date
+
+# Utiliser le modèle
+$ make predict TEXT="Aspirateur"
+```
+
 ---
+
+### Versionning V0
+
+#### Quoi est Tracké?
+
+**Git (code + configuration):**
+- `dvc.yaml` - Pipeline definition
+- `dvc.lock` - Hashes de tous les outputs 
+- `.gitignore` - Ignore les données
+
+**DVC Local Cache:**
+- data/raw/rakuten/*.csv (données brutes)
+- data/raw/rakuten/seeds/*.csv (seed outputs)
+- data/interim/preprocessed_dataset.csv
+- data/processed/*.npz, *.npy, *.pkl
+- models/text_classifier.pkl
+
+**DVC Remote (DagsHub S3):**
+- Tous les fichiers (si `dvc push` a été fait)
+
+### Architecture Fichiers V0
+
+```
+.
+├── .dvc/
+│   ├── config                  ← Configuration publique
+│   ├── config.local            ← Credentials (local, jamais git)
+│   └── cache/                  ← Local cache (auto-créé)
+│
+├── data/
+│   ├── raw/rakuten/
+│   │   ├── X_train_update.csv.dvc          ← Pointer DVC
+│   │   ├── Y_train_CVw08PX.csv.dvc         ← Pointer DVC
+│   │   ├── product_categories.csv.dvc      ← Pointer DVC
+│   │   └── seeds/
+│   │       ├── rakuten_batch_0001.csv      ← Seed outputs
+│   │       ├── rakuten_batch_0002.csv
+│   │       ├── ... (0010)
+│   │       ├── rakuten_dataset_full.csv
+│   │       └── rakuten_dataset_remainder.csv
+│   │
+│   ├── interim/
+│   │   ├── rakuten_train.csv               ← Initialized from seeding output
+│   │   └── preprocessed_dataset.csv        ← After cleaning
+│   │
+│   └── processed/
+│       ├── X_train_tfidf.npz               ← Train features
+│       ├── X_val_tfidf.npz                 ← Val features
+│       ├── y_train.npy                     ← Train target
+│       ├── y_val.npy                       ← Val target
+│       ├── tfidf_vectorizer.pkl            ← Artifact réutilisable
+│       ├── label_encoder.pkl               ← Artifact réutilisable
+│       └── class_mapping.json
+│
+├── models/
+│   └── text_classifier.pkl                 ← V0 Model
+│
+├── reports/
+│   ├── metrics_val.json                    ← Validation metrics
+│   ├── classification_report_val.txt
+│   └── confusion_matrix_val.npy
+│
+├── dvc.yaml                                ← Pipeline definition
+├── dvc.lock                                ← Hashes (Git-tracked)
+└── README.md
+```
+
+### Versionning - Ingestion incrémentale
+
+Après V0, créer des versions incrémentales via ingestion de nouvelles données via l'invite de commande pour le moment.
+
+### Architecture V0.1+
+
+V0 crée une **baseline immuable**. V0.1+ ajoute des données de manière incrémentale:
+- Il a fallu crée une version rakuten_train_current.csv. Un output suivi et modifié par un stage relance le stage en question. 
+```
+V0 Baseline (Immutable):
+  rakuten_train.csv (créé par seed, jamais modifié)
+  
+V0.1+ Ingestion (Mutable):
+  rakuten_train_current.csv (initialisé par seed, modifié par ingest)
+    ↓
+  [ingest batch_0003] → +1000 rows
+    ↓
+  [dvc repro] → détecte le changement
+    ↓
+  [preprocess → train → evaluate]
+    ↓
+  dvc.lock v0.1 (nouveau hash)
+```
+
+### Créer v1 (exemple)
+
+#### 1. Ingérer les Données
+
+```bash
+# Ajouter un batch supplémentaire
+$ make ingest CSV_PATH=data/raw/rakuten/seeds/rakuten_batch_0003.csv
+
+# Résultat:
+# - rakuten_train_current.csv modifié
+# - Contient maintenant: train initial +  batch_0003 (1000) 
+```
+
+#### 2. Relancer le Pipeline
+
+```bash
+# DVC détecte que rakuten_train_current.csv a changé
+# Relance: preprocess → transform → train → evaluate
+$ dvc repro
+
+# Résultat:
+# - dvc.lock mis à jour (nouveaux hashes)
+# - Nouveau modèle entraîné avec l'ingestion incrémentale
+```
+
+#### 3. Vérifier les Résultats
+
+```bash
+# Voir les métriques v1
+$ dvc metrics show
+```
+
+#### 4. Committer v1
+
+```bash
+# Ajouter dvc.lock
+$ git add dvc.lock
+
+# Committer
+$ git commit -m "v1: ingest batch003"
+
+# Pousser
+$ git push
+```
+
+#### 5. (Optionnel) Pousser les Données
+
+```bash
+# Sauvegarder v1 dans le cloud
+$ dvc push
+```
+
+### Workflow Ingestion Rapide
+
+Une fois qu'on a v0, créer les différentes versions par le schéma là :
+
+```bash
+# 1. Ingérer
+$ make ingest CSV_PATH=.../rakuten_batch_0005.csv
+
+# 2. Relancer
+$ dvc repro
+
+# 3. Committer
+$ git add dvc.lock
+$ git commit -m "v2: ingest batch005"
+
+# 4. Pousser (optionnel)
+$ dvc push
+$ git push
+```
 ---
 
 ## Application FastAPI

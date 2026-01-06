@@ -11,7 +11,7 @@ class DataIngestion:
     """
     Ingestion incrémentale:
     - prend un CSV uploadé (designation, prdtypecode)
-    - append dans data/interim/rakuten_train.csv
+    - append dans data/interim/rakuten_train_current.csv
     """
 
     def __init__(self, config: DataIngestionConfig) -> None:

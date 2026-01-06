@@ -113,10 +113,14 @@ class DataSeeding:
         remainder_df.to_csv(remainder_path, index=False)
         logger.debug(f"Remainder rows: {len(remainder_df)}")
 
-        # 10. Initialiser data/interim/rakuten_train.csv avec le remainder
+        # 10. Initialiser data/interim/rakuten_train.csv avec le remainder et le current
         dataset_path = cfg.output_dataset_path
         logger.info(f"Initialisation de rakuten_dataset vers : {dataset_path}")
         remainder_df.to_csv(dataset_path, index=False)
+
+        current_dataset_path = cfg.output_current_dataset_filename
+        logger.info(f"Initialisation de rakuten_dataset vers : {current_dataset_path}")
+        remainder_df.to_csv(current_dataset_path, index=False)
 
         logger.success("DataSeeding terminé avec succès")
         return dataset_path

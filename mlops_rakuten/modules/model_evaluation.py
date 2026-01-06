@@ -99,7 +99,8 @@ class ModelEvaluation:
         logger.info(
             f"Sauvegarde de la matrice de confusion (validation) vers : {cfg.confusion_matrix_path}"
         )
-        np.save(cfg.confusion_matrix_path, cm)
+        with open(cfg.confusion_matrix_path, "w") as f:
+            f.write(str(cm))
 
         logger.success("ModelEvaluation terminée avec succès")
         return cfg.metrics_path

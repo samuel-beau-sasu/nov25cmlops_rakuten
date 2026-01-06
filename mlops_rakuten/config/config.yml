@@ -5,6 +5,7 @@ data_seeding:
   output_full_dataset_filename: "rakuten_dataset_full.csv"
   output_remainder_dataset_filename: "rakuten_dataset_remainder.csv"
   output_dataset_filename: "rakuten_train.csv"
+  output_current_dataset_filename: "rakuten_train_current.csv"
 
   # colonnes
   text_column: "designation"
@@ -17,7 +18,7 @@ data_seeding:
 
 data_ingestion:
   # Fichier d'entrée / sortie
-  train_filename: "rakuten_train.csv"
+  train_filename: "rakuten_train_current.csv"
 
   # colonnes
   text_column: "designation"
@@ -26,7 +27,7 @@ data_ingestion:
 
 data_preprocessing:
   # Fichiers d'entrée / sortie
-  input_dataset_filename: "rakuten_train.csv"
+  input_dataset_filename: "rakuten_train_current.csv"
   output_dataset_filename: "preprocessed_dataset.csv"
 
   # colonnes
@@ -104,7 +105,7 @@ model_evaluation:
   # Fichiers de sortie pour les résultats de validation
   metrics_filename: "metrics_val.json"
   classification_report_filename: "classification_report_val.txt"
-  confusion_matrix_filename: "confusion_matrix_val.npy"
+  confusion_matrix_filename: "confusion_matrix_val.txt"
 
 
 prediction:

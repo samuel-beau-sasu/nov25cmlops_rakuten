@@ -10,6 +10,7 @@ class DataSeedingConfig:
     output_remainder_path: Path
     output_dataset_path: Path
     seeds_dir: Path
+    output_current_dataset_filename: Path
 
     text_column: str
     target_column: str

@@ -42,7 +42,7 @@ stages:
   preprocess:
     cmd: python mlops_rakuten/pipelines/data_preprocessing.py
     deps:
-      - data/interim/rakuten_train.csv
+      - data/interim/rakuten_train_current.csv
       - mlops_rakuten/modules/data_preprocessing.py
       - mlops_rakuten/pipelines/data_preprocessing.py
       - mlops_rakuten/config/config.yml

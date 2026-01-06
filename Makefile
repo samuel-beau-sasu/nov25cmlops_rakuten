@@ -98,7 +98,7 @@ predict: requirements
 
 
 #################################################################################
-# DVC & DAGHUB                                             						#
+# DVC & DAGHUB     V0 Init                                        				#
 #################################################################################
 
 ## Initialize DVC config.local with credentials interactively
@@ -116,6 +116,21 @@ dvc-credentials:
 dvc-test:
 	@echo "Test connexion DVC vers DagsHub..."
 	@dvc status && echo "Connected to DagsHub" || echo "Connection failed"
+
+## Pipeline reproduction with DVC
+.PHONY: dvc-init
+dvc-init: requirements
+	dvc repro
+
+## Push DVC tracked files to DagsHub remote storage
+.PHONY: dvc-push
+dvc-push:
+	dvc push
+
+## pull DVC tracked files from DagsHub remote storage
+.PHONY: dvc-pull
+dvc-pull:
+	dvc pull
 
 #################################################################################
 # Self Documenting Commands                                                     #
