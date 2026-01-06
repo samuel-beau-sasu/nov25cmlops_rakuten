@@ -311,8 +311,9 @@ $ make dvc-init
 #### Committer dans Git
 
 ```bash
-# Ajouter dvc.lock (très important!)
-$ git add data/raw/rakuten/seeds/.gitignore dvc.lock
+# Ajouter dvc.lock 
+§ dvc add data/interim/rakuten_train_current.csv
+$ git add data/raw/rakuten/seeds/.gitignore dvc.lock data/interim
 # Committer
 $ git commit -m "v0: seed + full pipeline execution"
 
@@ -425,7 +426,7 @@ $ make predict TEXT="Aspirateur"
 
 ### Versionning - Ingestion incrémentale
 
-Après V0, créer des versions incrémentales via ingestion de nouvelles données via l'invite de commande pour le moment.
+Après V0, créer des versions incrémentales via ingestion de nouvelles données via l'invite de commande CLI ou via l'API.
 
 ### Architecture V0.1+
 
@@ -434,12 +435,15 @@ V0 crée une **baseline immuable**. V0.1+ ajoute des données de manière incré
 ```
 V0 Baseline (Immutable):
   rakuten_train.csv (créé par seed, jamais modifié)
+  rakuten_train_current.csv (sera tracké comme un artifacts par DVC)
   
 V0.1+ Ingestion (Mutable):
   rakuten_train_current.csv (initialisé par seed, modifié par ingest)
     ↓
   [ingest batch_0003] → +1000 rows
     ↓
+  [dvc add data/interim/rakuten_train_current.csv] → pointeurs .dvc créé
+      ↓
   [dvc repro] → détecte le changement
     ↓
   [preprocess → train → evaluate]
@@ -454,6 +458,9 @@ V0.1+ Ingestion (Mutable):
 ```bash
 # Ajouter un batch supplémentaire
 $ make ingest CSV_PATH=data/raw/rakuten/seeds/rakuten_batch_0003.csv
+
+# UPDATE artifact metadata
+$ dvc add data/interim/rakuten_train_current.csv
 
 # Résultat:
 # - rakuten_train_current.csv modifié
@@ -478,12 +485,10 @@ $ dvc repro
 # Voir les métriques v1
 $ dvc metrics show
 ```
-
-#### 4. Committer v1
-
+#### 4. Via CLI ou API : Committer V1
 ```bash
 # Ajouter dvc.lock
-$ git add dvc.lock
+$ git add dvc.lock data/interim
 
 # Committer
 $ git commit -m "v1: ingest batch003"
@@ -507,14 +512,18 @@ Une fois qu'on a v0, créer les différentes versions par le schéma là :
 # 1. Ingérer
 $ make ingest CSV_PATH=.../rakuten_batch_0005.csv
 
-# 2. Relancer
+
+# 2. Update 
+§ dvc add data/interim/rakuten_train_current.csv
+
+# 3. Relancer
 $ dvc repro
 
-# 3. Committer
+# 4. Committer
 $ git add dvc.lock
 $ git commit -m "v2: ingest batch005"
 
-# 4. Pousser (optionnel)
+# 5. Pousser (optionnel)
 $ dvc push
 $ git push
 ```

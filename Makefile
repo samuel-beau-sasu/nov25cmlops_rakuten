@@ -121,6 +121,7 @@ dvc-test:
 .PHONY: dvc-init
 dvc-init: requirements
 	dvc repro
+	dvc add data/interim/rakuten_train_current.csv
 
 ## Push DVC tracked files to DagsHub remote storage
 .PHONY: dvc-push
@@ -136,14 +137,10 @@ dvc-pull:
 # DVC & DAGHUB     Ingestion                                       				#
 #################################################################################
 
-## pull DVC tracked files from DagsHub remote storage
-.PHONY: dvc-pull
-dvc-pull:
-	dvc pull
-
 ## Pipeline reproduction with DVC
 .PHONY: dvc-ingest
 dvc-ingest: requirements ingest $(CSV_PATH)
+	dvc add data/interim/rakuten_train_current.csv
 	dvc repro
 
 
