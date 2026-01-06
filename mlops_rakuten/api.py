@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import yaml
 from pathlib import Path
 import shutil
+import subprocess
 from typing import Any, Dict, List, Optional
 
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, status
@@ -21,14 +23,11 @@ from mlops_rakuten.config.constants import (
     MODELS_DIR,
     REPORTS_DIR,
     UPLOADS_DIR,
+    PROJ_ROOT
 )
 from mlops_rakuten.pipelines.data_ingestion import DataIngestionPipeline
-from mlops_rakuten.pipelines.data_preprocessing import DataPreprocessingPipeline
-from mlops_rakuten.pipelines.data_transformation import DataTransformationPipeline
-from mlops_rakuten.pipelines.model_evaluation import ModelEvaluationPipeline
-from mlops_rakuten.pipelines.model_trainer import ModelTrainerPipeline
 from mlops_rakuten.pipelines.prediction import PredictionPipeline
-from mlops_rakuten.utils import create_directories, get_latest_run_dir
+from mlops_rakuten.utils import create_directories
 
 REQUIRED_COLUMNS = ["designation", "prdtypecode"]
 
@@ -38,6 +37,34 @@ app = FastAPI(
     description="API d'inférence pour la classification de produits Rakuten.",
     version="0.1.0",
 )
+
+def get_dvc_lock_info() -> Dict[str, Any]:
+    """Récupère les infos du dvc.lock"""
+    dvc_lock_path = PROJ_ROOT / "dvc.lock"
+    
+    try:
+        if dvc_lock_path.exists():
+            with open(dvc_lock_path, 'r') as f:
+                dvc_lock = yaml.safe_load(f)
+            
+            # Extraire les hashes des outputs
+            stages_info = {}
+            for stage_name, stage_data in dvc_lock.items():
+                if 'outs' in stage_data:
+                    stages_info[stage_name] = {
+                        'outputs': stage_data['outs'],
+                        'timestamp': stage_data.get('cmd', '').split()[-1] if stage_data.get('cmd') else None
+                    }
+            
+            return {
+                'dvc_lock_path': str(dvc_lock_path),
+                'stages': stages_info,
+                'last_modified': dvc_lock_path.stat().st_mtime
+            }
+    except Exception as e:
+        logger.error(f"Erreur lecture dvc.lock: {e}")
+    
+    return {}
 
 
 def read_json(path: Path) -> Dict[str, Any]:
@@ -185,7 +212,7 @@ async def get_model_config(_=Depends(require_admin)):
     models/<latest>/model_config.json
     """
     try:
-        latest_model_dir = get_latest_run_dir(MODELS_DIR)
+        latest_model_dir = MODELS_DIR
         path = latest_model_dir / "model_config.json"
 
         logger.info(f"Lecture model_config.json : {path}")
@@ -214,7 +241,7 @@ async def get_model_metrics(_=Depends(require_admin)):
     reports/<latest>/metrics_val.json
     """
     try:
-        latest_report_dir = get_latest_run_dir(REPORTS_DIR)
+        latest_report_dir = REPORTS_DIR
         path = latest_report_dir / "metrics_val.json"
 
         logger.info(f"Lecture metrics_val.json : {path}")
@@ -243,7 +270,7 @@ async def get_model_classification_report(_=Depends(require_admin)):
     reports/<latest>/classification_report_val.txt
     """
     try:
-        latest_report_dir = get_latest_run_dir(REPORTS_DIR)
+        latest_report_dir = REPORTS_DIR
         path = latest_report_dir / "classification_report_val.txt"
 
         logger.info(f"Lecture classification_report_val.txt : {path}")
@@ -261,6 +288,57 @@ async def get_model_classification_report(_=Depends(require_admin)):
         logger.exception("Erreur inattendue dans /model/classification")
         raise HTTPException(status_code=500, detail="Erreur interne serveur") from e
 
+@app.get("/dvc/lock")
+async def get_dvc_lock(_=Depends(require_admin)):
+    """
+    Retourne le contenu du dvc.lock (hashes de tous les outputs)
+    
+    Utile pour:
+      - Vérifier la reproductibilité
+      - Voir les hashes des versions
+      - Déboguer les cachés DVC
+    """
+    logger.info("Requête /dvc/lock reçue")
+    
+    dvc_lock_path = PROJ_ROOT / "dvc.lock"
+    
+    try:
+        if not dvc_lock_path.exists():
+            raise FileNotFoundError("dvc.lock not found")
+        
+        with open(dvc_lock_path, 'r') as f:
+            dvc_lock = yaml.safe_load(f)
+        
+        return {
+            'path': str(dvc_lock_path),
+            'content': dvc_lock
+        }
+    
+    except Exception as e:
+        logger.error(f"Erreur lecture dvc.lock: {e}")
+        raise HTTPException(status_code=404, detail=str(e))
+
+@app.get("/dvc/dag")
+async def get_dvc_dag(_=Depends(require_user)):
+    """
+    Retourne le DAG du pipeline DVC
+    """
+    logger.info("Requête /dvc/dag reçue")
+    
+    try:
+        result = subprocess.run(
+            ["dvc", "dag"],
+            cwd=PROJ_ROOT,
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode == 0: 
+            return {"dag": result.stdout} 
+        else: raise Exception(result.stderr or "dvc dag failed") 
+    except Exception as e: 
+        logger.error(f"Erreur dvc dag: {e}") 
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/ingest")
 async def ingest_csv(file: UploadFile = File(...), _=Depends(require_admin)) -> Dict[str, Any]:
@@ -299,28 +377,38 @@ async def ingest_csv(file: UploadFile = File(...), _=Depends(require_admin)) -> 
         logger.error(f"Validation échouée: {e}")
         raise HTTPException(status_code=422, detail=f"CSV invalide: {e}") from e
 
-    # 3) Ingestion (append au dataset courant) + training chain
+    # 3) Ingestion + DVC repro (détecte changements)
     try:
+        # Ingérer les données
         ingestion_pipeline = DataIngestionPipeline()
         ingested_dataset_path = ingestion_pipeline.run(uploaded_csv_path=uploads_path)
+        logger.success(f"Ingestion complète: {ingested_dataset_path}")
 
-        preprocessing_path = DataPreprocessingPipeline().run()
-        transformation_path = DataTransformationPipeline().run()
-        model_path = ModelTrainerPipeline().run()
-        metrics_path = ModelEvaluationPipeline().run()
+        # Relancer le pipeline DVC (détecte changement rakuten_train_CURRENT.csv)
+        logger.info("Lancement dvc repro...")
+        result = subprocess.run(
+            ["dvc", "repro"],
+            cwd=PROJ_ROOT,
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode != 0:
+            logger.error(f"dvc repro failed: {result.stderr}")
+            raise Exception(f"dvc repro failed: {result.stderr}")
+        
+        logger.success("dvc repro complète")
+
 
         return {
             "status": "ok",
+            "message": "Ingestion + retraining complète via dvc repro",
             "uploaded_file": str(uploads_path),
             "ingested_dataset": str(ingested_dataset_path),
-            "preprocessed": str(preprocessing_path),
-            "transformed": str(transformation_path),
-            "model": str(model_path),
-            "metrics": str(metrics_path),
+            "pipeline_status": "completed via dvc repro",
+            "dvc_lock": str(PROJ_ROOT / "dvc.lock")
         }
 
-    except HTTPException:
-        raise
     except Exception as e:
-        logger.exception("Erreur lors du pipeline ingestion+train")
-        raise HTTPException(status_code=500, detail="Erreur pipeline ingestion+train") from e
+        logger.exception("Erreur ingestion + dvc repro")
+        raise HTTPException(status_code=500, detail=f"Pipeline error: {str(e)}") from e

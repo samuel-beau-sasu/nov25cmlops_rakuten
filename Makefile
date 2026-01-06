@@ -133,6 +133,21 @@ dvc-pull:
 	dvc pull
 
 #################################################################################
+# DVC & DAGHUB     Ingestion                                       				#
+#################################################################################
+
+## pull DVC tracked files from DagsHub remote storage
+.PHONY: dvc-pull
+dvc-pull:
+	dvc pull
+
+## Pipeline reproduction with DVC
+.PHONY: dvc-ingest
+dvc-ingest: requirements ingest $(CSV_PATH)
+	dvc repro
+
+
+#################################################################################
 # Self Documenting Commands                                                     #
 #################################################################################
 

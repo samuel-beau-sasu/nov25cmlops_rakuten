@@ -528,6 +528,23 @@ Lancer l'application FastAPI
 Pour accéder à l'API
    [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
+
+FastAPI.py structure:
+
+├── Imports
+├── Schemas Pydantic (VersionInfo, etc.)
+├── Prediction Pipeline initialization
+├── Endpoints
+│   ├── /health
+│   ├── /token
+│   ├── /dvc/lock          (NEW)
+│   ├── /dvc/dag           (NEW)
+│   ├── /predict
+│   ├── /ingest            (MODIFIED)
+│   ├── /model/config
+│   ├── /model/metrics
+│   └── /model/classification
+
 ---
 
 ## Commit
