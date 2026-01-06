@@ -384,7 +384,28 @@ async def ingest_csv(file: UploadFile = File(...), _=Depends(require_admin)) -> 
         ingested_dataset_path = ingestion_pipeline.run(uploaded_csv_path=uploads_path)
         logger.success(f"Ingestion complète: {ingested_dataset_path}")
 
-        # Relancer le pipeline DVC (détecte changement rakuten_train_CURRENT.csv)
+
+        #Update de l'artifact DVC
+        logger.info("Step 2: DVC add (update artifact)...")
+        
+        current_csv_path = Path("data/interim/rakuten_train_current.csv")
+        
+        # Exécuter: dvc add data/interim/rakuten_train_current.csv
+        result = subprocess.run(
+            ["dvc", "add", str(current_csv_path)],
+            cwd=PROJ_ROOT,
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode != 0:
+            logger.error(f"dvc add failed: {result.stderr}")
+            raise Exception(f"dvc add failed: {result.stderr}")
+        
+        logger.success("DVC add complète")
+        logger.info(f"current.csv.dvc updated with new hash")
+
+        # Relancer le pipeline DVC (détecte changement rakuten_train_current.csv)
         logger.info("Lancement dvc repro...")
         result = subprocess.run(
             ["dvc", "repro"],
