@@ -68,6 +68,13 @@ class ModelTrainerConfig:
     C: float
     max_iter: int
     use_class_weight: bool
+    
+    # Champs MLflow optionnels
+    mlflow_tracking_uri: str = None
+    mlflow_experiment_name: str = None
+    mlflow_run_name: str = None
+    mlflow_artifact_path: str = None
+    enable_mlflow: bool = False
 
 
 @dataclass

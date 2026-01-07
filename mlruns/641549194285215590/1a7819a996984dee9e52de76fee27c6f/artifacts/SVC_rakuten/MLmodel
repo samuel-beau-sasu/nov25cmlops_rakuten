@@ -1,0 +1,13 @@
+artifact_path: SVC_rakuten
+flavors:
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+mlflow_version: 2.22.4
+model_size_bytes: 25
+model_uuid: 7c55f6ae4d1841e5a7b95ea9ea783079
+prompts: null
+run_id: 1a7819a996984dee9e52de76fee27c6f
+utc_time_created: '2026-01-07 10:43:07.545804'

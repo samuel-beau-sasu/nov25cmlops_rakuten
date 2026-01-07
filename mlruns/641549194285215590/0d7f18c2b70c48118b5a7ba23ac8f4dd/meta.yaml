@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/nov25cmlops_rakuten/mlruns/641549194285215590/0d7f18c2b70c48118b5a7ba23ac8f4dd/artifacts
+end_time: 1767786442035
+entry_point_name: ''
+experiment_id: '641549194285215590'
+lifecycle_stage: active
+run_id: 0d7f18c2b70c48118b5a7ba23ac8f4dd
+run_name: simple_run
+run_uuid: 0d7f18c2b70c48118b5a7ba23ac8f4dd
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1767786425342
+status: 3
+tags: []
+user_id: ubuntu

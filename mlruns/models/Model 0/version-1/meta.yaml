@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1767804404447
+current_stage: Staging
+description: ''
+last_updated_timestamp: 1767804521940
+name: Model 0
+run_id: 0d7f18c2b70c48118b5a7ba23ac8f4dd
+run_link: ''
+source: file:///home/ubuntu/nov25cmlops_rakuten/mlruns/641549194285215590/0d7f18c2b70c48118b5a7ba23ac8f4dd/artifacts/SVC_rakuten
+status: READY
+status_message: null
+storage_location: file:///home/ubuntu/nov25cmlops_rakuten/mlruns/641549194285215590/0d7f18c2b70c48118b5a7ba23ac8f4dd/artifacts/SVC_rakuten
+user_id: null
+version: 1

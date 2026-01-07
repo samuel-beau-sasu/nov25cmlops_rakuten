@@ -154,6 +154,12 @@ class ConfigurationManager:
             C=c["C"],
             max_iter=c["max_iter"],
             use_class_weight=c["use_class_weight"],
+            # Partie MLflow
+            mlflow_tracking_uri=c["mlflow_tracking_uri"], 
+            mlflow_experiment_name=c["mlflow_experiment_name"],
+            mlflow_run_name=c["mlflow_run_name"],
+            mlflow_artifact_path=c["mlflow_artifact_path"],
+            enable_mlflow=c["enable_mlflow"],
         )
 
     def get_model_evaluation_config(self) -> ModelEvaluationConfig:

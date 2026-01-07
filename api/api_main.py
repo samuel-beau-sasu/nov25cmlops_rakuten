@@ -12,6 +12,8 @@ import os
 import sys
 #import json
 import re
+import mlflow
+from mlops_rakuten.pipelines.prediction import PredictionPipeline
 
 
 
@@ -402,8 +404,8 @@ async def predict_texts_old(request: PredictionRequest):
         raise HTTPException(status_code=500, detail=f"Erreur de prédiction: {str(e)}")
 
 
-@app.post("/predict", response_model=PredictionResponse)
-async def predict_texts(request: PredictionRequest):
+#@app.post("/predict", response_model=PredictionResponse)
+async def predict_texts_old_2(request: PredictionRequest):
     try:
         predictions_list = []
 
@@ -449,6 +451,50 @@ async def predict_texts(request: PredictionRequest):
     except Exception as e:
         logger.error(f"Erreur inattendue: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/predict", response_model=PredictionResponse)
+async def predict_texts(request: PredictionRequest):
+    try:
+        # 1. Charger le modèle une seule fois
+        EXPERIMENT_ID = '641549194285215590'
+        RUN_ID = '1332ab4ac58e48ee8eb9f9d1c1d64201'
+        model_path = f'/home/ubuntu/nov25cmlops_rakuten/mlruns/{EXPERIMENT_ID}/{RUN_ID}/artifacts/SVC_rakuten'
+
+        try:
+            model = mlflow.sklearn.load_model(model_path)
+            pipeline = PredictionPipeline()
+        except FileNotFoundError as e:
+            logger.error(f"Modèle introuvable: {str(e)}")
+            raise HTTPException(status_code=404, detail="Modèle introuvable.")
+        except Exception as e:
+            logger.error(f"Erreur lors du chargement du modèle: {str(e)}")
+            raise HTTPException(status_code=500, detail="Erreur interne lors du chargement du modèle.")
+
+        # 2. Calculer les prédictions pour tous les textes
+        predictions_list = []
+        for text in request.texts:
+            try:
+                pred = pipeline.run([text])
+                predictions_list.extend(pred)  # ou append(pred[0]) selon le format de retour
+            except ValueError as e:
+                logger.error(f"Erreur de prédiction pour le texte '{text}': {str(e)}")
+                raise HTTPException(status_code=400, detail=f"Erreur de prédiction: {str(e)}")
+            except Exception as e:
+                logger.error(f"Erreur inattendue pour le texte '{text}': {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Erreur interne: {str(e)}")
+
+        # 3. Retourner la réponse
+        return PredictionResponse(
+            predictions=predictions_list,
+            count=len(predictions_list)
+        )
+
+    except HTTPException:
+        # Les exceptions HTTP sont déjà levées, pas besoin de les recapturer ici
+        raise
+    except Exception as e:
+        logger.error(f"Erreur inattendue globale: {str(e)}")
+        raise HTTPException(status_code=500, detail="Erreur interne du serveur.")
 
 
 if __name__ == "__main__":
