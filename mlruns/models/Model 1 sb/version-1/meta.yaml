@@ -1,0 +1,15 @@
+aliases: []
+creation_timestamp: 1767858488702
+current_stage: Production
+description: "Premier model en production \n\nEXPERIMENT_ID = '641549194285215590'\nRUN_ID
+  = '1332ab4ac58e48ee8eb9f9d1c1d64201'"
+last_updated_timestamp: 1767858575618
+name: Model 1 sb
+run_id: 1332ab4ac58e48ee8eb9f9d1c1d64201
+run_link: ''
+source: file:///home/ubuntu/nov25cmlops_rakuten/mlruns/641549194285215590/1332ab4ac58e48ee8eb9f9d1c1d64201/artifacts/SVC_rakuten
+status: READY
+status_message: null
+storage_location: file:///home/ubuntu/nov25cmlops_rakuten/mlruns/641549194285215590/1332ab4ac58e48ee8eb9f9d1c1d64201/artifacts/SVC_rakuten
+user_id: null
+version: 1

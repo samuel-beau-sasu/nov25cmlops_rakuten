@@ -5,6 +5,7 @@ from typing import Dict, Optional, List, Any
 import pandas as pd
 import io
 import logging
+from loguru import logger
 from datetime import datetime
 import uuid
 import subprocess
@@ -14,6 +15,7 @@ import sys
 import re
 import mlflow
 from mlops_rakuten.pipelines.prediction import PredictionPipeline
+from mlops_rakuten.pipelines.model_trainer import ModelTrainerPipeline
 
 
 
@@ -123,7 +125,7 @@ def validate_csv(file: UploadFile, required_columns: Optional[List[str]] = None)
 
 # ==================== FONCTION DE TRAINING EN BACKGROUND ====================
 
-def run_training_job(job_id: str):
+def run_training_job_old(job_id: str):
     """
     Exécute le pipeline de training en arrière-plan avec 'make train'
     Version simplifiée et robuste
@@ -220,7 +222,45 @@ def run_training_job(job_id: str):
             "stderr": stderr[:500]
         })
         logger.error(f"❌ Job {job_id}: Erreur - {str(e)}")
+    
+def run_training_job(job_id: str):
+
+    
+    try:
+        training_jobs[job_id]["status"] = "running"
+        training_jobs[job_id]["started_at"] = datetime.now().isoformat()
         
+        logger.info(f"🚀 Job {job_id}: Début du pipeline de training")
+        logger.info(f"📁 Répertoire courant: {os.getcwd()}")
+        
+        # 4. Entraînement du modèle
+        model_trainer_pipeline = ModelTrainerPipeline()
+        model_path = model_trainer_pipeline.run()
+        
+        #logger.success(f"Modèle entraîné disponible à : {model_path}")       
+        logger.info(f"Modèle entraîné disponible à : {model_path}")  
+        logger.info(f"✅ Job {job_id}: Training terminé avec succès")
+        
+    except subprocess.TimeoutExpired:
+        training_jobs[job_id].update({
+            "status": "failed",
+            "failed_at": datetime.now().isoformat(),
+            "error": "Timeout après 1 heure",
+            "stdout": stdout[:500],
+            "stderr": stderr[:500]
+        })
+        logger.error(f"⏰ Job {job_id}: Timeout après 1 heure")
+        
+    except Exception as e:
+        training_jobs[job_id].update({
+            "status": "failed",
+            "failed_at": datetime.now().isoformat(),
+            "error": str(e),
+            "stdout": stdout[:500],
+            "stderr": stderr[:500]
+        })
+        logger.error(f"❌ Job {job_id}: Erreur - {str(e)}")
+      
 # ==================== ENDPOINTS ====================
 
 @app.get('/')

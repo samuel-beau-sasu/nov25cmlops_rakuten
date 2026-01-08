@@ -1,5 +1,7 @@
 # installation de mlflow
 
+https://github.com/julientherier/nov25cmlops_rakuten.git
+
 # Option 1: Version stable récente
 uv add "mlflow>=2.16.0,<3.0"
 
