@@ -11,16 +11,10 @@ import uuid
 import subprocess
 import os 
 import sys
-#import json
 import re
 import mlflow
 from mlops_rakuten.pipelines.prediction import PredictionPipeline
 from mlops_rakuten.pipelines.model_trainer import ModelTrainerPipeline
-
-
-
-# ✅ Import de votre fonction de training refactorisée
-#from mlops_rakuten.main import run_training_pipeline, run_prediction
 
 
 # Configuration du logging
@@ -71,6 +65,13 @@ class LoadAndTrainResponse(BaseModel):
     file_info: Optional[FileInfo] = None
     job_id: Optional[str] = None
     check_status_url: Optional[str] = None
+
+class PredictionRequest(BaseModel):
+    texts: List[str] = Field(..., description="Liste de textes à prédire")
+
+class PredictionResponse(BaseModel):
+    predictions: List[int]
+    count: int
 
 # Stockage des fichiers et des jobs
 training_data = {
@@ -124,104 +125,6 @@ def validate_csv(file: UploadFile, required_columns: Optional[List[str]] = None)
 
 
 # ==================== FONCTION DE TRAINING EN BACKGROUND ====================
-
-def run_training_job_old(job_id: str):
-    """
-    Exécute le pipeline de training en arrière-plan avec 'make train'
-    Version simplifiée et robuste
-    """
-    # Initialiser les résultats
-    result = None
-    stdout = ""
-    stderr = ""
-    
-    try:
-        training_jobs[job_id]["status"] = "running"
-        training_jobs[job_id]["started_at"] = datetime.now().isoformat()
-        
-        logger.info(f"🚀 Job {job_id}: Début du pipeline de training")
-        logger.info(f"📁 Répertoire courant: {os.getcwd()}")
-        
-        # ✅ Exécution de 'make train' via subprocess
-        result = subprocess.run(
-            #["make", "train"],
-            [sys.executable, "mlops_rakuten/main.py", "train"],
-            capture_output=True,
-            text=True,
-            cwd=os.getcwd(),
-            timeout=3600
-        )
-        
-        # Récupérer les sorties
-        stdout = result.stdout
-        stderr = result.stderr
-        
-        logger.info(f"📊 Job {job_id}: make train terminé avec code {result.returncode}")
-        logger.info(f"📤 stdout: {len(stdout)} caractères")
-        logger.info(f"📥 stderr: {len(stderr)} caractères")
-        
-        # Vérifier le code de retour
-        if result.returncode != 0:
-            # Le processus a échoué
-            error_msg = f"make train a échoué (code: {result.returncode})"
-            if stderr:
-                # Prendre la première ligne d'erreur significative
-                error_lines = [line for line in stderr.split('\n') if line.strip()]
-                if error_lines:
-                    error_msg += f" - {error_lines[0]}"
-            
-            raise Exception(error_msg)
-        
-        # ✅ SUCCÈS : Analyser la sortie
-        training_results = {
-            "status": "success",
-            "return_code": result.returncode,
-            "stdout": stdout,
-            "stderr": stderr,
-            "message": "Training terminé avec succès"
-        }
-        
-        # Extraire les chemins (si présents dans la sortie)
-        if "Modèle :" in stdout:
-            for line in stdout.split('\n'):
-                if "Modèle :" in line:
-                    training_results["model_path"] = line.split("Modèle :")[-1].strip()
-                elif "Métriques :" in line:
-                    training_results["metrics_path"] = line.split("Métriques :")[-1].strip()
-        
-        # Mettre à jour le job
-        training_jobs[job_id].update({
-            "status": "completed",
-            "completed_at": datetime.now().isoformat(),
-            "model_path": training_results.get("model_path"),
-            "metrics_path": training_results.get("metrics_path"),
-            "message": training_results["message"],
-            "results": training_results,
-            "stdout": stdout[:500],  # Stocker un extrait
-            "stderr": stderr[:500]
-        })
-        
-        logger.info(f"✅ Job {job_id}: Training terminé avec succès")
-        
-    except subprocess.TimeoutExpired:
-        training_jobs[job_id].update({
-            "status": "failed",
-            "failed_at": datetime.now().isoformat(),
-            "error": "Timeout après 1 heure",
-            "stdout": stdout[:500],
-            "stderr": stderr[:500]
-        })
-        logger.error(f"⏰ Job {job_id}: Timeout après 1 heure")
-        
-    except Exception as e:
-        training_jobs[job_id].update({
-            "status": "failed",
-            "failed_at": datetime.now().isoformat(),
-            "error": str(e),
-            "stdout": stdout[:500],
-            "stderr": stderr[:500]
-        })
-        logger.error(f"❌ Job {job_id}: Erreur - {str(e)}")
     
 def run_training_job(job_id: str):
 
@@ -415,82 +318,6 @@ async def list_training_jobs(admin: str = Depends(authenticate_admin)):
 
 
 # ==================== ENDPOINT DE PRÉDICTION ====================
-
-class PredictionRequest(BaseModel):
-    texts: List[str] = Field(..., description="Liste de textes à prédire")
-
-class PredictionResponse(BaseModel):
-    predictions: List[int]
-    count: int
-
-#@app.post("/predict", response_model=PredictionResponse)
-async def predict_texts_old(request: PredictionRequest):
-    """
-    Effectue des prédictions sur une liste de textes
-    """
-    try:
-        logger.info(f"Prédiction pour {len(request.texts)} texte(s)")
-        
-        # ✅ APPEL DE VOTRE FONCTION DE PRÉDICTION
-        #predictions = run_prediction(request.texts)
-        
-        return PredictionResponse(
-            predictions=predictions,
-            count=len(predictions)
-        )
-        
-    except Exception as e:
-        logger.error(f"Erreur de prédiction: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Erreur de prédiction: {str(e)}")
-
-
-#@app.post("/predict", response_model=PredictionResponse)
-async def predict_texts_old_2(request: PredictionRequest):
-    try:
-        predictions_list = []
-
-        for text in request.texts:
-            process_result = subprocess.run(
-                [
-                    sys.executable,
-                    "-m", "mlops_rakuten.main",
-                    "predict",
-                    text
-                ],
-                capture_output=True,
-                text=True,
-                timeout=3600
-            )
-
-            #stdout = process_result.stdout.strip()
-            stderr = process_result.stderr.strip()
-
-            #logger.info(f"Sortie stdout: {stdout}")
-            logger.info(f"Sortie stderr: {stderr}")
-
-            if process_result.returncode != 0:
-                error_message = stderr
-                logger.error(f"Erreur lors de l'exécution du script: {error_message}")
-                raise HTTPException(status_code=500, detail=f"Erreur lors de l'exécution du script: {error_message}")
-
-            # Utiliser une expression régulière pour extraire la prédiction
-            match = re.search(r"prdtypecode prédit : (\d+)", stderr)
-            
-            prediction = int(match.group(1))
-            predictions_list.append(prediction)
-
-        return PredictionResponse(
-            predictions=predictions_list,
-            count=len(predictions_list)
-        )
-
-    except subprocess.TimeoutExpired:
-        logger.error("Le processus a dépassé le temps limite autorisé.")
-        raise HTTPException(status_code=504, detail="Le processus a dépassé le temps limite autorisé.")
-
-    except Exception as e:
-        logger.error(f"Erreur inattendue: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/predict", response_model=PredictionResponse)
 async def predict_texts(request: PredictionRequest):
