@@ -140,8 +140,17 @@ dvc-pull:
 ## Pipeline reproduction with DVC
 .PHONY: dvc-ingest
 dvc-ingest: requirements ingest $(CSV_PATH)
-	dvc add data/interim/rakuten_train_current.csv
 	dvc repro
+
+#################################################################################
+# MFLOW                                     									#
+#################################################################################
+
+## Server MLflow UI
+.PHONY: mlflow-server
+mlflow-server:
+	mlflow ui --host 0.0.0.0 --port 5000
+
 
 
 #################################################################################

@@ -14,42 +14,6 @@ from mlops_rakuten.pipelines.prediction import PredictionPipeline
 app = typer.Typer()
 
 
-def _run_training_chain() -> tuple[Path, Path, Path, Path]:
-    """
-    Exécute la chaîne standard d'entraînement:
-    preprocessing -> transformation -> training -> evaluation
-
-    Retourne:
-      (preprocessed_path, transformed_path, model_path, metrics_path)
-    """
-    # 1. Prétraitement
-    preprocessing_pipeline = DataPreprocessingPipeline()
-    preprocessing_output_path = preprocessing_pipeline.run()
-    logger.success(f"Dataset prétraité disponible à : {preprocessing_output_path}")
-
-    # 2. Transformation
-    transformation_pipeline = DataTransformationPipeline()
-    transformation_output_path = transformation_pipeline.run()
-    logger.success(f"Dataset transformé disponible à : {transformation_output_path}")
-
-    # 3. Entraînement
-    model_trainer_pipeline = ModelTrainerPipeline()
-    model_path = model_trainer_pipeline.run()
-    logger.success(f"Modèle entraîné disponible à : {model_path}")
-
-    # 4. Évaluation
-    model_evaluation_pipeline = ModelEvaluationPipeline()
-    metrics_path = model_evaluation_pipeline.run()
-    logger.success(f"Métriques de validation disponibles dans : {metrics_path}")
-
-    return (
-        preprocessing_output_path,
-        transformation_output_path,
-        model_path,
-        metrics_path,
-    )
-
-
 @app.command()
 def seed():
     """
@@ -64,7 +28,6 @@ def seed():
     seeding_output_path = seeding_pipeline.run()
     logger.info(f"Dataset initial disponible à : {seeding_output_path}")
 
-    _run_training_chain()
 
 
 @app.command()
@@ -95,7 +58,7 @@ def train():
     - le pipeline d'évaluation du modèle
     """
     logger.info("Lancement du pipeline d'entraînement du modèle")
-    _run_training_chain()
+
 
 
 @app.command()

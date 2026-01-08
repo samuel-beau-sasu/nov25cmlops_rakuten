@@ -442,7 +442,7 @@ V0.1+ Ingestion (Mutable):
     ↓
   [ingest batch_0003] → +1000 rows
     ↓
-  [dvc add data/interim/rakuten_train_current.csv] → pointeurs .dvc créé
+  [dvc add data/interim/rakuten_train_current.csv] → pointeurs .dvc créé à l'initialisation
       ↓
   [dvc repro] → détecte le changement
     ↓
@@ -458,9 +458,6 @@ V0.1+ Ingestion (Mutable):
 ```bash
 # Ajouter un batch supplémentaire
 $ make ingest CSV_PATH=data/raw/rakuten/seeds/rakuten_batch_0003.csv
-
-# UPDATE artifact metadata
-$ dvc add data/interim/rakuten_train_current.csv
 
 # Résultat:
 # - rakuten_train_current.csv modifié
@@ -512,18 +509,14 @@ Une fois qu'on a v0, créer les différentes versions par le schéma là :
 # 1. Ingérer
 $ make ingest CSV_PATH=.../rakuten_batch_0005.csv
 
-
-# 2. Update 
-§ dvc add data/interim/rakuten_train_current.csv
-
-# 3. Relancer
+# 2. Relancer
 $ dvc repro
 
-# 4. Committer
-$ git add dvc.lock
+# 3. Committer
+$ git add data/interim/rakuten_train_current.csv.dvc dvc.lock
 $ git commit -m "v2: ingest batch005"
 
-# 5. Pousser (optionnel)
+# 4. Pousser (optionnel)
 $ dvc push
 $ git push
 ```

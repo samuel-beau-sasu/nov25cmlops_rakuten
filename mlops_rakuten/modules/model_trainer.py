@@ -5,6 +5,7 @@ import pickle
 from loguru import logger
 import numpy as np
 from scipy import sparse
+import mlflow
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, f1_score
 from sklearn.svm import LinearSVC
@@ -107,17 +108,31 @@ class ModelTrainer:
         # Rapport de classification détaillé
         cls_report = classification_report(y_train, y_pred_train)
 
-        # 5. Créer le répertoire des modèles si besoin
+        # ─────────────────────────────────────────────────────────────
+        # LOG TO MLFLOW 
+        # ─────────────────────────────────────────────────────────────
+        logger.info("Logging training metrics to MLflow...")
+        mlflow.log_metric("train_accuracy", train_accuracy)
+        mlflow.log_metric("train_f1_macro", train_f1_macro)
+
+        # 5. Save model
         create_directories([cfg.model_dir])
 
-        # 6. Sauvegarder le modèle
         logger.info(f"Sauvegarde du modèle vers : {cfg.model_path}")
         with open(cfg.model_path, "wb") as f:
             pickle.dump(model, f)
 
-        # 7. Sauvegarder un fichier de configuration lisible
+        # LOG MODEL ARTIFACT
+        logger.info("Logging model artifact to MLflow...")
+        mlflow.sklearn.log_model(
+            model,
+            "model",
+            registered_model_name="rakuten_classifier"
+        )
+
+        # 6. Save config
         model_config_path = cfg.model_dir / "model_config.json"
-        logger.info(f"Sauvegarde de la configuration du modèle vers : {model_config_path}")
+        logger.info(f"Sauvegarde de la configuration vers : {model_config_path}")
 
         model_config = {
             "model_type": cfg.model_type,
@@ -129,15 +144,18 @@ class ModelTrainer:
             "training_data": {
                 "X_train_path": str(cfg.X_train_path),
                 "y_train_path": str(cfg.y_train_path),
+                "X_train_rows": X_train.shape[0],
             },
         }
 
         with open(model_config_path, "w") as f:
             json.dump(model_config, f, indent=2)
 
-        # 8. Sauvegarder les métriques d'entraînement
+        mlflow.log_artifact(str(model_config_path), artifact_path="config")
+
+        # 7. Save train metrics
         metrics_path = cfg.model_dir / "metrics_train.json"
-        logger.info(f"Sauvegarde des métriques d'entraînement vers : {metrics_path}")
+        logger.info(f"Sauvegarde des métriques vers : {metrics_path}")
 
         metrics = {
             "train_accuracy": train_accuracy,
@@ -147,12 +165,16 @@ class ModelTrainer:
         with open(metrics_path, "w") as f:
             json.dump(metrics, f, indent=2)
 
-        # 9. Sauvegarder le rapport de classification texte
+        mlflow.log_artifact(str(metrics_path), artifact_path="metrics")
+
+        # 8. Save train report
         cls_report_path = cfg.model_dir / "classification_report_train.txt"
-        logger.info(f"Sauvegarde du rapport de classification (train) vers : {cls_report_path}")
+        logger.info(f"Sauvegarde du rapport vers : {cls_report_path}")
 
         with open(cls_report_path, "w") as f:
             f.write(cls_report)
+
+        mlflow.log_artifact(str(cls_report_path), artifact_path="reports")
 
         logger.success("ModelTrainer terminé avec succès")
         return cfg.model_path

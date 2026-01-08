@@ -29,15 +29,15 @@ stages:
       - data/raw/rakuten/seeds/rakuten_batch_0008.csv
       - data/raw/rakuten/seeds/rakuten_batch_0009.csv
       - data/raw/rakuten/seeds/rakuten_batch_0010.csv
-      - data/raw/rakuten/seeds/rakuten_dataset_full.csv    # Full dataset
+      - data/raw/rakuten/seeds/rakuten_dataset_full.csv # Full dataset
       - data/raw/rakuten/seeds/rakuten_dataset_remainder.csv # Remaining data
       - data/interim/rakuten_train.csv
     params:
       - mlops_rakuten/config/config.yml:
           - data_seeding
 
-# Optionnel : ingestion incrémentale de nouvelles données, gèré par un tracking dvc externe sur l'output data/interim/rakuten_train.csv
-    
+  # Optionnel : ingestion incrémentale de nouvelles données, gèré par un tracking dvc externe sur l'output data/interim/rakuten_train.csv
+
   # Stage 2: Data Preprocessing - nettoyage et préparation
   preprocess:
     cmd: python mlops_rakuten/pipelines/data_preprocessing.py
@@ -61,7 +61,7 @@ stages:
       - mlops_rakuten/pipelines/data_transformation.py
       - mlops_rakuten/config/config.yml
     outs:
-      -  data/processed/class_mapping.json
+      - data/processed/class_mapping.json
       - data/processed/X_train_tfidf.npz
       - data/processed/X_val_tfidf.npz
       - data/processed/y_train.npy
@@ -87,7 +87,7 @@ stages:
       - models/metrics_train.json
       - models/model_config.json
       - models/classification_report_train.txt
-    
+
     params:
       - mlops_rakuten/config/config.yml:
           - model_trainer

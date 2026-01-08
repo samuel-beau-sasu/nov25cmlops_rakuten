@@ -3,6 +3,7 @@ from pathlib import Path
 import pickle
 
 from loguru import logger
+import mlflow
 import numpy as np
 from scipy import sparse
 from sklearn.metrics import (
@@ -73,34 +74,43 @@ class ModelEvaluation:
 
         cm = confusion_matrix(y_val, y_pred)
 
-        # 5. S'assurer que le dossier modèles existe
+        # ─────────────────────────────────────────────────────────────
+        # LOG TO MLFLOW 
+        # ─────────────────────────────────────────────────────────────
+        logger.info("Logging validation metrics to MLflow...")
+        mlflow.log_metric("val_accuracy", val_accuracy)
+        mlflow.log_metric("val_f1_macro", val_f1_macro)
+        mlflow.log_metric("val_f1_weighted", val_f1_weighted)
+
+        # 5. Create directories
         create_directories([cfg.metrics_dir])
 
-        # 6. Sauvegarder les métriques
+        # 6. Save metrics
         metrics = {
             "val_accuracy": val_accuracy,
             "val_f1_macro": val_f1_macro,
             "val_f1_weighted": val_f1_weighted,
         }
 
-        logger.info(f"Sauvegarde des métriques de validation vers : {cfg.metrics_path}")
+        logger.info(f"Sauvegarde des métriques vers : {cfg.metrics_path}")
         with open(cfg.metrics_path, "w") as f:
             json.dump(metrics, f, indent=2)
 
-        # 7. Sauvegarder le rapport de classification
-        logger.info(
-            "Sauvegarde du rapport de classification (validation) "
-            f"vers : {cfg.classification_report_path}"
-        )
+        mlflow.log_artifact(str(cfg.metrics_path), artifact_path="metrics")
+
+        # 7. Save classification report
+        logger.info(f"Sauvegarde du rapport vers : {cfg.classification_report_path}")
         with open(cfg.classification_report_path, "w") as f:
             f.write(cls_report)
 
-        # 8. Sauvegarder la matrice de confusion
-        logger.info(
-            f"Sauvegarde de la matrice de confusion (validation) vers : {cfg.confusion_matrix_path}"
-        )
+        mlflow.log_artifact(str(cfg.classification_report_path), artifact_path="reports")
+
+        # 8. Save confusion matrix
+        logger.info(f"Sauvegarde de la matrice vers : {cfg.confusion_matrix_path}")
         with open(cfg.confusion_matrix_path, "w") as f:
             f.write(str(cm))
+
+        mlflow.log_artifact(str(cfg.confusion_matrix_path), artifact_path="reports")
 
         logger.success("ModelEvaluation terminée avec succès")
         return cfg.metrics_path
