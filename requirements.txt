@@ -11,5 +11,6 @@ pandas
 scikit-learn
 tqdm
 typer
+httpx
 prometheus-fastapi-instrumentator
 -e .
