@@ -74,7 +74,7 @@ Product type classification for Rakuten France
     │   ├── schemas_app.py          <- pydantic Models
     │   └── train_app.py            <- API Train Service
     │
-    ├── config
+    ├── auth
     │   ├── auth_simple.py          <- OAuth2 authentication
     │   ├── hash_password.py        <- Utility script for getting password hash
     │   └── users.json              <- Users and Admins lists
