@@ -220,12 +220,12 @@ stages:
       size: 3224
     - path: mlops_rakuten/modules/model_trainer.py
       hash: md5
-      md5: 34dcffa7b62ecc769d8a656c58c4e22d
-      size: 6537
+      md5: f45f16cb81ec0a9ce55fad46128b2691
+      size: 10546
     - path: mlops_rakuten/pipelines/model_trainer.py
       hash: md5
-      md5: 513e2b76dd371b9eff6522e1a3ce1719
-      size: 7552
+      md5: 7dc78dc8ae715f5faca0b5c1b8d0f747
+      size: 8251
     params:
       mlops_rakuten/config/config.yml:
         model_trainer:
@@ -247,8 +247,8 @@ stages:
       size: 82
     - path: models/model_config.json
       hash: md5
-      md5: 2dcd287739340686d303fe3085eb44ae
-      size: 375
+      md5: e4328b30de3bb41cdc2fffce198d1e3b
+      size: 586
     - path: models/text_classifier.pkl
       hash: md5
       md5: c49a8ecc228bec46153d8e8b5f026339

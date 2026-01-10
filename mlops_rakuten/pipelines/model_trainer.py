@@ -1,8 +1,20 @@
 from pathlib import Path
 from loguru import logger
-import mlflow
-import json
 import yaml
+import json
+
+# ═══════════════════════════════════════════════════════════════════════════
+# 1. DAGSHUB INIT - DOIT ÊTRE EN PREMIER (avant mlflow)
+# ═══════════════════════════════════════════════════════════════════════════
+import dagshub
+dagshub.init(
+    repo_owner='shiff-oumi',
+    repo_name='nov25cmlops_rakuten_dag',
+    mlflow=True
+)
+
+# 2. MLFLOW SETUP - après DagsHub
+import mlflow
 
 from mlops_rakuten.config.config_manager import ConfigurationManager
 from mlops_rakuten.modules.model_trainer import ModelTrainer
@@ -85,12 +97,11 @@ class ModelTrainerPipeline:
 
 
 if __name__ == "__main__":
-    # 1. SETUP MLFLOW (mode local)
-    mlflow.set_tracking_uri("file:./mlruns")
+    # DagsHub a déjà setup mlflow, donc pas besoin de set_tracking_uri
     mlflow.set_experiment("rakuten_classification_v0")
     
     logger.info("=" * 80)
-    logger.info("TRAINING PIPELINE (with MLflow + DVC tracking)")
+    logger.info("TRAINING PIPELINE (with MLflow + DVC + DagsHub tracking)")
     logger.info("=" * 80)
     
     try:
@@ -139,14 +150,14 @@ if __name__ == "__main__":
             # LOG TAGS (pour la recherche rapide)
             # ───────────────────────────────────────────────────────────────
             mlflow.set_tag("stage", "train")
-            mlflow.set_tag("pipeline", "full_dvc")
+            mlflow.set_tag("pipeline", "full_dvc_dagshub")
             mlflow.set_tag("data_input_hash", lineage["data_input_hash"])
             mlflow.set_tag("model_version", lineage["model_hash"])
             
             logger.success("\n" + "=" * 80)
-            logger.success(f"Training completed with full DVC traceability")
+            logger.success(f"Training completed with full DVC + DagsHub traceability")
             logger.success(f"Run ID: {run_id}")
-            logger.success(f"Data → Model lineage tracked")
+            logger.success(f"Data → Model lineage tracked in DagsHub")
             logger.success("=" * 80)
     
     except Exception as e:

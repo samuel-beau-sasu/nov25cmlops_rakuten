@@ -27,7 +27,7 @@ clean:
 ## Delete processed and interim data
 .PHONY: clean-data
 clean-data:
-	rm -rf data/raw/rakuten/seeds
+	rm -rf data/raw/rakuten/seeds/*.csv
 	rm -rf data/processed/*
 	rm -rf data/interim/*
 

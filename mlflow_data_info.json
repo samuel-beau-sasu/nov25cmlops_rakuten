@@ -1,0 +1,6 @@
+{
+  "X_train_size": 6142255,
+  "y_train_size": 491792,
+  "X_train_path": "/home/shiff/datascientest/nov25cmlops_rakuten/data/processed/X_train_tfidf.npz",
+  "y_train_path": "/home/shiff/datascientest/nov25cmlops_rakuten/data/processed/y_train.npy"
+}

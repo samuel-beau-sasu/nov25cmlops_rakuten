@@ -22,4 +22,5 @@ typer
 uvicorn
 dvc[s3]
 mlflow
+dagshub
 -e .
