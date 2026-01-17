@@ -1,0 +1,6 @@
+name: Rakuten_project
+
+entry_points:
+  main:
+    parameters: {}
+    command: "python experiment_01.py"

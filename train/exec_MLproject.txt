@@ -1,0 +1,4 @@
+
+#
+EXPERIMENT_ID=190155843876560128
+mlflow run train/ --experiment-id 190155843876560128 --run-name first_run_reproduced_v2 --env-manager=local

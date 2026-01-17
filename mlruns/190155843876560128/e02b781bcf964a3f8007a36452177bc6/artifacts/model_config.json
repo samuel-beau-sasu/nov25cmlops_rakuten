@@ -1,0 +1,12 @@
+{
+  "model_type": "linear_svc",
+  "params": {
+    "C": 1.0,
+    "max_iter": 2000,
+    "use_class_weight": true
+  },
+  "training_data": {
+    "X_train_path": "/home/ubuntu/Projet_MLOps/nov25cmlops_rakuten/data/processed/2026-01-16T17-54-37/X_train_tfidf.npz",
+    "y_train_path": "/home/ubuntu/Projet_MLOps/nov25cmlops_rakuten/data/processed/2026-01-16T17-54-37/y_train.npy"
+  }
+}
