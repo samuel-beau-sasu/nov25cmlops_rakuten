@@ -85,8 +85,8 @@ model_trainer:
   y_train_filename: "y_train.npy"
 
   # Type de modèle
-  #model_type: "logistic_regression"  # au lieu de "linear_svc"
-  model_type: "linear_svc"   # pour l'instant on ne gère que celui-ci
+  model_type: "logistic_regression"  # au lieu de "linear_svc"
+  #model_type: "linear_svc"   # pour l'instant on ne gère que celui-ci
 
   # Hyperparamètres du modèle
   C: 1.0
@@ -97,7 +97,7 @@ model_trainer:
   mlflow_tracking_uri: "http://127.0.0.1:8080"
   mlflow_experiment_name: "Rakuten_Models"
   mlflow_run_name: "first_run"
-  mlflow_artifact_path: "SVC_rakuten"
+  mlflow_artifact_path: "LR_rakuten"
   enable_mlflow: true
 
 

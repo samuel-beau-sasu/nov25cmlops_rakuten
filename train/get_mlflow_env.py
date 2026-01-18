@@ -40,23 +40,24 @@ def get_run_env_file(experiment_name="Rakuten_Models",
     if artifact_uri.startswith("file://"):
         artifact_uri = artifact_uri[7:]
 
-    # Get the svc_rakuten_path directory path
-    svc_rakuten_path = os.path.join(artifact_uri, "SVC_rakuten")
+    # Get the model_rakuten_path directory path
+    #model_rakuten_path = os.path.join(artifact_uri, "SVC_rakuten")
+    model_rakuten_path = os.path.join(artifact_uri, "LR_rakuten")
 
     # Copy python_env.yaml
-    python_env_src = os.path.join(svc_rakuten_path, "python_env.yaml")
+    python_env_src = os.path.join(model_rakuten_path, "python_env.yaml")
     if os.path.exists(python_env_src):
         shutil.copy2(python_env_src, output_path / "python_env.yaml")
         logging.info(f"Copied python_env.yaml to {output_dir}")
 
     # Copy conda.yaml if it exists
-    conda_src = os.path.join(svc_rakuten_path, "conda.yaml")
+    conda_src = os.path.join(model_rakuten_path, "conda.yaml")
     if os.path.exists(conda_src):
         shutil.copy2(conda_src, output_path / "conda.yaml")
         logging.info(f"Copied conda.yaml to {output_dir}")
 
     # Copy requirements.txt
-    requirements_src = os.path.join(svc_rakuten_path, "requirements.txt")
+    requirements_src = os.path.join(model_rakuten_path, "requirements.txt")
     if not os.path.exists(requirements_src):
         raise Exception("requirements.txt not found in artifacts")
     shutil.copy2(requirements_src, output_path / "requirements.txt")

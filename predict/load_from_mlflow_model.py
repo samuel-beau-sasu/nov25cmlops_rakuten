@@ -21,8 +21,11 @@ text = "Super aspirateur sans fil"
 #model_path = f"/home/ubuntu/Projet_MLPos/nov25cmlops_rakuten/mlruns/{EXPERIMENT_ID}/{RUN_ID}/artifacts/SVC_rakuten"
 
 # 2. Définir l'URI du modèle MLflow (CORRECTION ICI)
-RUN_ID = '4028188ca5cc4f6499a2614ff130c657'
-model_uri = f"runs:/{RUN_ID}/SVC_rakuten"  # Format correct MLflow
+#RUN_ID = '4028188ca5cc4f6499a2614ff130c657'
+#model_uri = f"runs:/{RUN_ID}/SVC_rakuten"  # Format correct MLflow
+
+RUN_ID = 'd99ad58b60b04e1f83403f2035f08db0'
+model_uri = f"runs:/{RUN_ID}/LR_rakuten"  # Format correct MLflow
 
 
 # 3. Charger le modèle
