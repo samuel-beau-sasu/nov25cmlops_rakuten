@@ -1,7 +1,7 @@
 from loguru import logger
 
 from mlops_rakuten.config.config_manager import ConfigurationManager
-from mlops_rakuten.modules.model_trainer import ModelTrainer_mlflow
+from mlops_rakuten.modules.model_trainer import ModelTrainer_mlflow, ModelTrainer
 
 def main():
     """
@@ -14,14 +14,8 @@ def main():
     model_trainer_config = config_manager.get_model_trainer_config()
     
     # 2. Créer le trainer avec MLflow
-    trainer = ModelTrainer_mlflow(
-        config=model_trainer_config,
-        #mlflow_tracking_uri="http://127.0.0.1:8080",
-        #mlflow_experiment_name="Rakuten_Models",
-        #mlflow_run_name="simple_run",
-        #mlflow_artifact_path="SVC_rakuten",
-        #enable_mlflow=True,
-    )
+    #trainer = ModelTrainer_mlflow(config=model_trainer_config )
+    trainer = ModelTrainer(config=model_trainer_config )
     
     # 3. Lancer l'entraînement
     model_path = trainer.run()

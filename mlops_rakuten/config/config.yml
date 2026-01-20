@@ -90,7 +90,7 @@ model_trainer:
 
   # Hyperparamètres du modèle
   C: 1.0
-  max_iter: 2000
+  max_iter: 1000
   use_class_weight: true     # "balanced" si true, ré-équilibrage des classes
 
   # Parametre pour mlflow

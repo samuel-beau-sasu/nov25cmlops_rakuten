@@ -3,7 +3,7 @@ from pathlib import Path
 from loguru import logger
 
 from mlops_rakuten.config.config_manager import ConfigurationManager
-from mlops_rakuten.modules.model_trainer import ModelTrainer
+from mlops_rakuten.modules.model_trainer import ModelTrainer, ModelTrainer_mlflow
 
 
 class ModelTrainerPipeline:
@@ -21,6 +21,7 @@ class ModelTrainerPipeline:
         model_trainer_config = config_manager.get_model_trainer_config()
 
         step = ModelTrainer(config=model_trainer_config)
+        #step = ModelTrainer_mlflow(config=model_trainer_config)
         model_path = step.run()
 
         logger.success(f"Pipeline ModelTrainer terminé. Modèle créé : {model_path}")

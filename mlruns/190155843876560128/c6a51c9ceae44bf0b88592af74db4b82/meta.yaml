@@ -1,0 +1,15 @@
+artifact_uri: file:///home/ubuntu/Projet_MLOps/nov25cmlops_rakuten/mlruns/190155843876560128/c6a51c9ceae44bf0b88592af74db4b82/artifacts
+end_time: 1768917229024
+entry_point_name: ''
+experiment_id: '190155843876560128'
+lifecycle_stage: active
+run_id: c6a51c9ceae44bf0b88592af74db4b82
+run_name: first_run
+run_uuid: c6a51c9ceae44bf0b88592af74db4b82
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1768917228919
+status: 3
+tags: []
+user_id: ubuntu
