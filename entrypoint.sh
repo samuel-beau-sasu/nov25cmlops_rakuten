@@ -35,32 +35,43 @@ git config --global url."git@github.com:".insteadOf "https://github.com/"
 # ============================================================================
 # 3. DVC Configuration (DagsHub)
 # ============================================================================
+#if [ -d "/app/.dvc" ]; then
+#    # Activer l'autostage
+#    dvc config core.autostage true
+#    
+#    # --- AJOUT : Configuration dynamique du Remote ---
+#    # Si le remote 'storage' n'existe pas, on le crée
+#    if ! dvc remote list | grep -q "storage"; then
+#        echo "[DVC] Adding missing remote 'storage'..."
+#        # On utilise les variables d'environnement pour construire l'URL
+#        # On suppose que DAGSHUB_USER et DAGSHUB_REPO sont passés au conteneur
+#        REMOTE_URL="https://dagshub.com/${DAGSHUB_USER}/${DAGSHUB_REPO}.dvc"
+#        dvc remote add -d storage "$REMOTE_URL" || echo "[Error] Could not add remote"
+#    fi#
+#
+#    # --- AJOUT : Authentification  ---
+#    if [ -n "$DAGSHUB_TOKEN" ]; then
+#        echo "[DVC] Configuring authentication for 'storage'..."
+#        dvc remote modify --local storage user "$DAGSHUB_USER"
+#        dvc remote modify --local storage password "$DAGSHUB_TOKEN"
+#        dvc remote modify --local storage auth basic
+#    fi
+#
+#    echo "[DVC] Current remotes:"
+#    dvc remote list
+#else
+#    echo "[Warning] .dvc directory not found"
+#fi
+
 if [ -d "/app/.dvc" ]; then
-    # Activer l'autostage
-    dvc config core.autostage true
+    # NOTE: Do NOT run "dvc config" commands here - they rewrite .dvc/config
+    # and can corrupt the remote URL syntax. All DVC config is in .dvc/config.
     
-    # --- AJOUT : Configuration dynamique du Remote ---
-    # Si le remote 'storage' n'existe pas, on le crée
-    if ! dvc remote list | grep -q "storage"; then
-        echo "[DVC] Adding missing remote 'storage'..."
-        # On utilise les variables d'environnement pour construire l'URL
-        # On suppose que DAGSHUB_USER et DAGSHUB_REPO sont passés au conteneur
-        REMOTE_URL="https://dagshub.com/${DAGSHUB_USER}/${DAGSHUB_REPO}.dvc"
-        dvc remote add -d storage "$REMOTE_URL" || echo "[Error] Could not add remote"
-    fi
-
-    # --- AJOUT : Authentification  ---
-    if [ -n "$DAGSHUB_TOKEN" ]; then
-        echo "[DVC] Configuring authentication for 'storage'..."
-        dvc remote modify --local storage user "$DAGSHUB_USER"
-        dvc remote modify --local storage password "$DAGSHUB_TOKEN"
-        dvc remote modify --local storage auth basic
-    fi
-
-    echo "[DVC] Current remotes:"
-    dvc remote list
+    echo "[DVC] Configuration loaded from .dvc/config"
+    echo "[DVC] Configured remotes:"
+    dvc remote list || echo "[DVC] No remotes configured"
 else
-    echo "[Warning] .dvc directory not found"
+    echo "[Warning] .dvc directory not found - DVC may not be initialized"
 fi
 
 # ============================================================================
