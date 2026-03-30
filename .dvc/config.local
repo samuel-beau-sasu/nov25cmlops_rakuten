@@ -1,0 +1,4 @@
+['remote "storage"']
+    user = samuel.beau
+    password = 33f76c5a6e0ac886af9db8538f62ca6dda4d76cc
+    auth = basic
