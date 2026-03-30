@@ -5,12 +5,12 @@ on:
   push:
     branches: 
         #[ main, master ]
-        - feature/mlflow-docker-dvc-sb-2
+        - feature/api-jt-test
 
   pull_request:
     branches: 
         #[ main, master ]
-        - feature/mlflow-docker-dvc-sb-2
+        - feature/api-jt-test
 
 jobs:
   test-suite:
