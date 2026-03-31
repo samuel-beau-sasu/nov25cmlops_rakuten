@@ -20,4 +20,6 @@ scikit-learn
 tqdm
 typer
 uvicorn
+dvc[s3]
+httpx
 -e .
