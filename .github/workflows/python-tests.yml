@@ -51,7 +51,7 @@ jobs:
           #dvc remote modify origin --project auth basic
           #dvc pull
           # On utilise 'python -m dvc' au lieu de 'dvc' tout court
-          python -m dvc remote modify origin --project auth basic
+          python -m dvc remote modify myfork --project auth basic
           python -m dvc pull
 
       # 5. Exécution de TOUS les tests dans le dossier /tests
