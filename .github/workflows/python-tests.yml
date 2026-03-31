@@ -55,6 +55,10 @@ jobs:
           python -m dvc pull
 
       # 5. Exécution de TOUS les tests dans le dossier /tests
+      - name: Create missing directories
+        run: |
+          mkdir -p data/processed data/raw data/interim logs models
+
       - name: Run all tests
         run: |
           # On lance pytest sur le dossier entier
