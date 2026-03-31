@@ -59,6 +59,13 @@ jobs:
         run: |
           mkdir -p data/processed data/raw data/interim logs models
 
+          # Création d'un faux dossier de "run" pour éviter le crash de l'initialisation
+          # On crée un dossier daté (ex: 2024-01-01_00-00-00) dans processed
+          mkdir -p data/processed/2024-01-01_00-00-00
+          
+          # On peut aussi créer un fichier vide pour le modèle si nécessaire
+          touch models/text_classifier.pkl
+
       - name: Run all tests
         run: |
           # On lance pytest sur le dossier entier
